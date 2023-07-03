@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@200;400;800&display=swap');
+
+:root {
+  --lightWhite: #FFFFED;
+  --lightRed: #EA473B;
+  --lightBlue: #93D4C5;
+
+  --darkBlueText: #2C3E50;
+
+  
+  --darkBlue: #30465A;
+  --darkBlueHF: #323E4A;
+  --darkGrey: #2C2C2C;
+
+  --primaryFont: 'Kanit', sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+body {
+  font-family: var(--primaryFont);
+  min-height: 100vh;
+}
