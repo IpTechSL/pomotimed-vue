@@ -47,7 +47,9 @@ function generateNewChron() {
     })
     
     timer.addEventListener("targetAchieved", () => {
-        console.log("Terminado");
+        const alarm = new Audio("https://cdn.freesound.org/previews/198/198841_285997-lq.mp3");
+        alarm.play();
+        isActive.value = false;
     })
 }
 
@@ -129,14 +131,19 @@ function modeAnim(instant) {
 
 
 // On mounted generate the chron / listen to resize.
-onMounted(() => {
+ onMounted(() => {
     generateNewChron();
     modeAnim();
     window.addEventListener("resize", () => {
         modeAnim(true)
     })
+
 })
 
+function sound() {
+    const audio = new Audio("https://cdn.freesound.org/previews/423/423957_6164481-lq.mp3");
+    audio.play();
+}
 
 
 </script>
@@ -163,7 +170,7 @@ onMounted(() => {
         </div>
 
         <div class="pomodoro-timer-settings-footer">
-            <img @click="changeSettings()" src="@/assets/icons/tick.svg" alt="Tick Icon">
+            <img @click="changeSettings()" src="/icons/tick.svg" alt="Tick Icon">
         </div>
     </div>
     <div class="pomodoro-timer">
@@ -182,7 +189,7 @@ onMounted(() => {
             <button aria-label="Config Timer" @click="settingsState = true;">
                 <img src="@/assets/icons/settings.svg" alt="Config timer Icon">
             </button>
-            <button aria-label="Start or Pause Timer" @click="changeChronState()">{{ isActive ? 'PAUSE' : 'START' }}</button>
+            <button aria-label="Start or Pause Timer" @click="changeChronState(); sound()">{{ isActive ? 'PAUSE' : 'START' }}</button>
             <button aria-label="Restart timer" @click="generateNewChron()">
                 <img src="@/assets/icons/Restart.svg" alt="Restart timer Icon">
             </button>
@@ -385,8 +392,8 @@ html[data-theme=dark] .pomodoro-timer {
 html[data-theme=dark] .modeLine {
     background-color: var(--lightRed);
 }
-html[data-theme=dark] button,
-html[data-theme=dark] p {
+html[data-theme=dark] .pomodoro-timer button,
+html[data-theme=dark] .pomodoro-timer p {
     color: var(--lightWhite);
 }
 

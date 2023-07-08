@@ -1,6 +1,7 @@
 <script setup>
 import { RouterLink } from 'vue-router';
-import { ref } from 'vue';
+import axios from 'axios';
+import { ref, onBeforeMount } from 'vue';
 
 let icon = ref("moon");
 let dark = true;
@@ -15,9 +16,77 @@ function setDark() {
 
     dark = !dark;
 }
+
+
+
+let links = ref([]);
+axios({
+    method: "GET",
+    url: "https://drupal.pomotimed.com/pomotimed/menu/navar",
+    auth: {
+        username: "admin",
+        password: "admin"
+    }
+})
+.then(response => links.value = response.data)
+
+const navLang = navigator.language.split("-");
+document.documentElement.lang = navLang[0]
+const lang = ref(document.documentElement.lang);
+const auth = false;
+const showLangSelector = ref(false);
+
+function changeLang(event) {
+    lang.value = event.target.dataset.value;
+    document.documentElement.lang = lang.value;
+}
+
+const languages = {
+    es: {
+        full: {
+            es: "Español",
+            en: "Spanish"
+        },
+        short: "es",
+        desc: {
+            es: "Idioma Español",
+            en: "Spanish language"
+        }
+    },
+    en: {
+        full: {
+            es: "Inglés",
+            en: "English"
+        },
+        short: "en",
+        desc: {
+            es: "Idioma Inglés",
+            en: "English Language"
+        }
+    }
+}
+
 </script>
 
 <template>
+
+
+    <button class="lang-selector" @click="showLangSelector = !showLangSelector">
+        <p class="lang-selector-selected">{{ lang.toUpperCase() }} <img style="width: 32px;" :src="`/icons/lang/${lang}.png`" :alt="lang + 'language'"></p> 
+        <ul v-if="showLangSelector">
+
+            <template v-for="language in languages">
+                
+                <li @click="changeLang($event)" :data-value="language.short">
+                    {{ language.short.toUpperCase() }} <img style="width: 32px;" :src="`/icons/lang/${language.short}.png`" :alt="language.desc[lang]">
+                </li>
+
+            </template>
+
+        </ul>
+    </button>
+
+
     <button aria-label="Change Theme" class="change-theme-button" @click="setDark()">
         <img :src="`/icons/${icon}.svg`" :alt="`${icon} Icon`">
     </button>
@@ -26,36 +95,40 @@ function setDark() {
         <div class="header-cont">
 
             <div class="leftLinks">
-    
-                <div class="links">
-                    <img src="@/assets/icons/clock.svg" alt="Clock Icon">
-                    <a href="#">Timer</a>
-                </div>
-    
-                <div class="links">
-                    <img src="@/assets/icons/task-list.svg" alt="Task list Icon">
-                    <a href="#">Projects</a>
-                </div>
-    
+                <template v-for="link in links" class="links">
+                    <template v-if="link.icon == 'time'">
+                        <div class="links">
+                            <img :src="`/icons/${link.icon}.svg`" :alt="link.title[idioma] + ' Icon'">
+                            <RouterLink :to="{path: '/'}">{{ link.title[lang] }}</RouterLink>
+                        </div>
+                    </template>
+                    <template v-if="link.icon == 'project'">
+                        <div class="links">
+                            <img :src="`/icons/${link.icon}.svg`" :alt="link.title[idioma] + ' Icon'">
+                            <RouterLink :to="{path: link.link}">{{ link.title[lang] }}</RouterLink>
+                        </div>
+                    </template>
+                </template>
             </div>
-            
+
             <div class="logo">
                 <img src="@/assets/socials/simple-logo.png" alt="PomoTimed Logo">
                 <p>PomoTimed</p>
             </div>
     
             <div class="rightLinks">
-    
-                <div class="links">
-                    <img src="@/assets/icons/faq.svg" alt="F.A.Q Icon">
-                    <a href="#">F.A.Q</a>
-                </div>
-    
-                <div class="links">
-                    <img src="@/assets/icons/user.svg" alt="User Icon">
-                    <a href="#">Log in</a>
-                </div>
-                
+                <template v-for="link in links" class="links">
+                    <template v-if="link.icon == 'faq' || link.icon == 'user'">
+                        <div v-if="link.title.en == 'Login' && !auth || link.icon == 'faq'" class="links">
+                            <img :src="`/icons/${link.icon}.svg`" :alt="link.title[lang] + ' Icon'">
+                            <RouterLink :to="{path: link.link}">{{ link.title[lang] }}</RouterLink>
+                        </div>
+                        <div style="order: 2;" v-else-if="link.title.en == 'Profile' && auth" class="links">
+                            <img :src="`/icons/${link.icon}.svg`" :alt="link.title[lang] + ' Icon'">
+                            <RouterLink :to="{path: link.link}">{{ link.title[lang] }}</RouterLink>
+                        </div>
+                    </template>
+                </template>
             </div>
 
             <div class="hamburguer-mobile">
@@ -119,6 +192,10 @@ header {
     border: none;
 }
 
+.lang-selector {
+    display: none;
+}
+
 html[data-theme=dark] body {
     background-color: var(--darkGrey);
 }
@@ -146,6 +223,10 @@ html[data-theme=dark] header {
         background-color: transparent !important;
         box-shadow: none;
         padding: 2rem 0;
+    }
+
+    .header-cont {
+        width: 80%;
     }
 
 
@@ -206,6 +287,82 @@ html[data-theme=dark] header {
     .change-theme-button {
         display: block;
         cursor: pointer;
+    }
+
+    .lang-selector {
+        display: block;
+        position: absolute;
+        top: 1rem;
+        left: .5rem;
+        background-color: transparent;
+        border: 1px solid var(--lightRed);
+        border-radius: 5px;
+        padding: .25rem;
+        font-size: .7rem;
+        cursor: pointer;
+    }
+
+    .lang-selector p {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .2rem;
+    }
+    
+    .lang-selector p img {
+        border-radius: 2px;
+        height: 16px;
+    }
+    
+    .lang-selector ul {
+        margin-top: 1rem;
+        padding: 0;
+        list-style: none;
+        outline: 1px solid var(--lightRed);
+        outline-offset: .25rem;
+        border-radius: 0 0 2px 2px;
+    }
+
+    .lang-selector ul {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .lang-selector ul li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        transition: all .25s;
+        padding: .2rem;
+    }
+
+    .lang-selector ul li:hover {
+        background-color: rgb(218, 211, 211);
+        border-radius: 5px;
+        scale: .95;
+    }
+
+    .lang-selector ul li img {
+        width: 32px;
+        object-fit: cover;
+        border-radius: 2px;
+        pointer-events: none;
+    }
+
+    html[data-theme=dark] .lang-selector {
+        color: var(--lightWhite);
+    }
+
+    html[data-theme=dark] .lang-selector ul li:hover{
+        color: var(--darkBlueHF);
+    }
+}
+
+@media screen and (min-width: 850px) {
+    .header-cont {
+        width: 90%;
     }
 }
 

@@ -1,6 +1,7 @@
 <script setup>
 
 import PomodoroTimer from '@/components/timer/pomodoro.vue';
+import Tasks from '@/components/tasks/tasks.vue';
 
 
 </script>
@@ -8,5 +9,6 @@ import PomodoroTimer from '@/components/timer/pomodoro.vue';
 <template>
   <main>
     <PomodoroTimer />
+    <Tasks />
   </main>
 </template>
