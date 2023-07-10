@@ -1,7 +1,7 @@
 <script setup>
 import { RouterLink } from 'vue-router';
 import axios from 'axios';
-import { ref, onBeforeMount } from 'vue';
+import { onMounted, ref } from 'vue';
 
 let icon = ref("moon");
 let dark = true;
@@ -36,61 +36,54 @@ const lang = ref(document.documentElement.lang);
 const auth = false;
 const showLangSelector = ref(false);
 
+const emit = defineEmits(["lang"]);
+
 function changeLang(event) {
     lang.value = event.target.dataset.value;
     document.documentElement.lang = lang.value;
+    emit("lang", lang)
 }
 
-const languages = {
-    es: {
-        full: {
-            es: "Español",
-            en: "Spanish"
-        },
-        short: "es",
-        desc: {
-            es: "Idioma Español",
-            en: "Spanish language"
-        }
-    },
-    en: {
-        full: {
-            es: "Inglés",
-            en: "English"
-        },
-        short: "en",
-        desc: {
-            es: "Idioma Inglés",
-            en: "English Language"
-        }
+
+let languages = ref();
+axios({
+    method: "GET",
+    url: "https://drupal.pomotimed.com/pomotimed/languages",
+    auth: {
+        username: "admin",
+        password: "admin"
     }
-}
+})
+.then(response => languages.value = response.data)
 
+onMounted(() => {
+    emit('lang', lang);
+})
 </script>
 
 <template>
 
-
-    <button class="lang-selector" @click="showLangSelector = !showLangSelector">
-        <p class="lang-selector-selected">{{ lang.toUpperCase() }} <img style="width: 32px;" :src="`/icons/lang/${lang}.png`" :alt="lang + 'language'"></p> 
-        <ul v-if="showLangSelector">
-
-            <template v-for="language in languages">
-                
-                <li @click="changeLang($event)" :data-value="language.short">
-                    {{ language.short.toUpperCase() }} <img style="width: 32px;" :src="`/icons/lang/${language.short}.png`" :alt="language.desc[lang]">
-                </li>
-
-            </template>
-
-        </ul>
-    </button>
-
-
-    <button aria-label="Change Theme" class="change-theme-button" @click="setDark()">
-        <img :src="`/icons/${icon}.svg`" :alt="`${icon} Icon`">
-    </button>
     <header class="header">
+    
+        <button class="lang-selector" @click="showLangSelector = !showLangSelector">
+            <p class="lang-selector-selected">{{ lang.toUpperCase() }} <img style="width: 32px;" :src="`/icons/lang/${lang}.png`" :alt="lang + 'language'"></p> 
+            <ul v-if="showLangSelector">
+    
+                <template v-for="language in languages">
+                    
+                    <li @click="changeLang($event)" :data-value="language.short">
+                        {{ language.short.toUpperCase() }} <img style="width: 32px;" :src="`/icons/lang/${language.short}.png`" :alt="language.desc[lang]">
+                    </li>
+    
+                </template>
+    
+            </ul>
+        </button>
+    
+    
+        <button aria-label="Change Theme" class="change-theme-button" @click="setDark()">
+            <img :src="`/icons/${icon}.svg`" :alt="`${icon} Icon`">
+        </button>
 
         <div class="header-cont">
 
@@ -98,13 +91,13 @@ const languages = {
                 <template v-for="link in links" class="links">
                     <template v-if="link.icon == 'time'">
                         <div class="links">
-                            <img :src="`/icons/${link.icon}.svg`" :alt="link.title[idioma] + ' Icon'">
+                            <img :src="`/icons/${link.icon}.svg`" :alt="link.title[lang] + ' Icon'">
                             <RouterLink :to="{path: '/'}">{{ link.title[lang] }}</RouterLink>
                         </div>
                     </template>
                     <template v-if="link.icon == 'project'">
                         <div class="links">
-                            <img :src="`/icons/${link.icon}.svg`" :alt="link.title[idioma] + ' Icon'">
+                            <img :src="`/icons/${link.icon}.svg`" :alt="link.title[lang] + ' Icon'">
                             <RouterLink :to="{path: link.link}">{{ link.title[lang] }}</RouterLink>
                         </div>
                     </template>

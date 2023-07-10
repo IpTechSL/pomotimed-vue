@@ -1,8 +1,9 @@
 <script setup>
 
 import Timer from 'easytimer.js';
-import { ref, onMounted } from 'vue';
+import { ref, onBeforeMount, onMounted, toRefs } from 'vue';
 import anime from 'animejs';
+import axios from 'axios';
 
 
 // Variables definitions.
@@ -18,7 +19,10 @@ let configMins = {
 let settingsState = ref(false);
 let timer;
 
-
+const props = defineProps({
+    lang: String
+});
+const { lang } = toRefs(props);
 // Chron state / generation.
 function changeChronState() {
     if(isActive.value) {
@@ -131,7 +135,8 @@ function modeAnim(instant) {
 
 
 // On mounted generate the chron / listen to resize.
- onMounted(() => {
+onMounted(async () => {
+    await getTranslates();
     generateNewChron();
     modeAnim();
     window.addEventListener("resize", () => {
@@ -146,26 +151,77 @@ function sound() {
 }
 
 
+let timerLanguages = ref({ 
+    "field_timer_state_start": { 
+        "en": "Start", 
+        "es": "Iniciar" 
+    }, 
+    "field_timer_state_stop": { 
+        "en": "Pause", 
+        "es": "Pausar" 
+    }, 
+    "field_pomodoro": { 
+        "en": "Pomodoro", 
+        "es": "Pomodoro" 
+    }, 
+    "field_long_break": { 
+        "en": "Long break", 
+        "es": "Descanso largo" 
+    }, 
+    "field_short_break": { 
+        "en": "Short break", 
+        "es": "Descanso corto" 
+    }, 
+    "field_settings_pomodoro": { 
+        "en": "Pomodoro minutes", 
+        "es": "Minutos de pomodoro" 
+    }, 
+    "field_settings_long": { 
+        "en": "Long break minutes", 
+        "es": "Minutos de descanso largo" 
+    },
+    "field_settings": {
+        "en": "Settings",
+        "es": "Ajustes"
+    },
+    "field_settings_short": { 
+        "en": "Short break minutes", 
+        "es": "Minutos de descanso corto" 
+    }, "field_settings_max": {
+         "en": "Maximum amount", 
+         "es": "Cantidad máxima" }
+    });
+async function getTranslates() {
+    await axios({
+        method: "GET",
+        url: "https://drupal.pomotimed.com/pomotimed/timer",
+        auth: {
+            username: "admin",
+            password: "admin"
+        }
+    })
+    .then(response => timerLanguages.value = response.data);
+} 
 </script>
 
 <template>
     <div v-if="settingsState" class="pomodoro-timer-settings">
         <div class="pomodoro-timer-settings-head">
-            <h2>Settings</h2>
-            <p>Maximun amount: 60</p>
+            <h2>{{ timerLanguages.field_settings[lang] }}</h2>
+            <p>{{ timerLanguages.field_settings_max[lang] }}: 60</p>
         </div>
         <div class="pomodoro-timer-settings-body">
             <div class="setting-timer">
-                <label for="pomodoro-minutes">Pomodoro minutes</label>
-                <input min="1" max="59" type="number" name="pomodoro-minutes" id="pomodoro-minutes" v-model="configMins.pomodoro">
+                <label for="pomodoro-minutes">{{ timerLanguages.field_settings_pomodoro[lang] }}</label>
+                <input min="1" max="60" type="number" name="pomodoro-minutes" id="pomodoro-minutes" v-model="configMins.pomodoro">
             </div>
             <div class="setting-timer">
-                <label for="small-minutes">Small break minutes</label>
-                <input min="1" max="59" type="number" name="small-minutes" id="small-minutes" v-model="configMins.short">
+                <label for="small-minutes">{{ timerLanguages.field_settings_short[lang] }}</label>
+                <input min="1" max="60" type="number" name="small-minutes" id="small-minutes" v-model="configMins.short">
             </div>
             <div class="setting-timer">
-                <label for="long-minutes">Long break minutes</label>
-                <input min="1" max="59" type="number" name="long-minutes" id="long-minutes" v-model="configMins.long">
+                <label for="long-minutes">{{ timerLanguages.field_settings_long[lang] }}</label>
+                <input min="1" max="60" type="number" name="long-minutes" id="long-minutes" v-model="configMins.long">
             </div>
         </div>
 
@@ -175,9 +231,9 @@ function sound() {
     </div>
     <div class="pomodoro-timer">
         <div class="pomodoro-timer-head">
-            <button aria-label="Pomodoro Timer Mode" @click="changeMode(1, $event)" :class="selectedMode == 1 ? 'selected' : ''">Pomodoro</button>
-            <button aria-label="Short Break Mode" @click="changeMode(2, $event)" :class="selectedMode == 2 ? 'selected' : ''">Short break</button>
-            <button aria-label="Long Break Mode" @click="changeMode(3, $event)" :class="selectedMode == 3 ? 'selected' : ''">Long break</button>
+            <button aria-label="Pomodoro Timer Mode" @click="changeMode(1, $event)" :class="selectedMode == 1 ? 'selected' : ''">{{ timerLanguages.field_pomodoro[lang] }}</button>
+            <button aria-label="Short Break Mode" @click="changeMode(2, $event)" :class="selectedMode == 2 ? 'selected' : ''">{{ timerLanguages.field_short_break[lang] }}</button>
+            <button aria-label="Long Break Mode" @click="changeMode(3, $event)" :class="selectedMode == 3 ? 'selected' : ''">{{ timerLanguages.field_long_break[lang]}}</button>
             <span aria-hidden="true" class="modeLine"></span>
         </div>
         <div class="pomodoro-timer-body">
@@ -189,7 +245,7 @@ function sound() {
             <button aria-label="Config Timer" @click="settingsState = true;">
                 <img src="@/assets/icons/settings.svg" alt="Config timer Icon">
             </button>
-            <button aria-label="Start or Pause Timer" @click="changeChronState(); sound()">{{ isActive ? 'PAUSE' : 'START' }}</button>
+            <button aria-label="Start or Pause Timer" @click="changeChronState(); sound()">{{ isActive ? timerLanguages.field_timer_state_stop[lang] : timerLanguages.field_timer_state_start[lang] }}</button>
             <button aria-label="Restart timer" @click="generateNewChron()">
                 <img src="@/assets/icons/Restart.svg" alt="Restart timer Icon">
             </button>
@@ -201,7 +257,6 @@ function sound() {
 
 .pomodoro-timer-settings {
     position: absolute;
-    height: 75%;
     width: 95%;
     border-radius: 10px;
     top: 50%;
@@ -233,7 +288,7 @@ function sound() {
 .pomodoro-timer-settings-body {
     display: flex;
     flex-direction: column;
-    gap: 3rem;
+    gap: 2rem;
 }
 
 .setting-timer {
@@ -378,6 +433,11 @@ html[data-theme=dark] .pomodoro-timer-settings-body label {
     color: var(--darkBlueText);
     font-size: 1.3rem;
     box-shadow: 0px 4px 12px 4px rgba(0, 0, 0, 0.25);
+}
+
+.pomodoro-timer-footer button img {
+    width: 24px;
+    height: 24px;
 }
 
 .pomodoro-timer-head .selected {
