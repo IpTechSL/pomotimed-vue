@@ -65,8 +65,9 @@ let menuMobile = ref(false);
 function animMobile() {
     
     const duration = 100;
-
+    
     if(menuMobile.value) {
+        document.body.style.overflow = "auto";
 
         anime({
             targets: ".mobile-menu-body nav ul li",
@@ -123,7 +124,7 @@ function animMobile() {
         })
 
     } else {
-
+        document.body.style.overflow = "hidden";
         anime({
             targets: ".mobile-menu-body nav ul li",
             opacity: 1,
@@ -140,11 +141,11 @@ function animMobile() {
             easing: "easeInQuart",
             height: [{
                 delay: 50,
-                value: "100%"
+                value: "100vh"
             }],
             width: [{
                 delay: 0,
-                value: "100%"
+                value: "100vw"
             }],
             borderRadius: {
                 delay: 50,
