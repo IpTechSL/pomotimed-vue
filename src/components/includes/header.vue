@@ -2,6 +2,7 @@
 import { RouterLink } from 'vue-router';
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
+import anime from 'animejs';
 
 let icon = ref("moon");
 let dark = true;
@@ -38,13 +39,6 @@ const showLangSelector = ref(false);
 
 const emit = defineEmits(["lang"]);
 
-function changeLang(event) {
-    lang.value = event.target.dataset.value;
-    document.documentElement.lang = lang.value;
-    emit("lang", lang)
-}
-
-
 let languages = ref();
 axios({
     method: "GET",
@@ -56,9 +50,146 @@ axios({
 })
 .then(response => languages.value = response.data)
 
+function changeLang(event) {
+    lang.value = event.target.dataset.value;
+    document.documentElement.lang = lang.value;
+    emit("lang", lang)
+}
+
 onMounted(() => {
     emit('lang', lang);
 })
+
+
+let menuMobile = ref(false);
+function animMobile() {
+    
+    const duration = 100;
+
+    if(menuMobile.value) {
+
+        anime({
+            targets: ".mobile-menu-body nav ul li",
+            left: "-10px",
+            bottom: "-10px",
+            opacity: 0,
+        })
+        
+        anime({
+            targets: ".mobile-menu",
+            duration: duration,
+            easing: "linear",
+            width: 0,
+            height: 0,
+            borderRadius: "0px 0px 0px 100px",
+            complete: () => {
+                document.querySelector(".mobile-menu").style.display = "none";
+            }
+        })
+
+        anime({
+            targets: ".hamburguer-mobile div:nth-child(1)",
+            top: {
+                delay: 100,
+                value: "0rem"
+            },
+            rotate: 0,
+            duration: duration,
+            easing: "easeInOutElastic"
+        })
+    
+        anime({
+            targets: ".hamburguer-mobile div:nth-child(2)",
+            opacity: {
+                delay: 200,
+                value: 1
+            },
+            duration: 800
+        })
+        
+        anime({
+            targets: ".hamburguer-mobile div:nth-child(3)",
+            width: {
+                delay: 100,
+                value: 22
+            },
+            bottom: {
+                delay: 100,
+                value: "0rem"
+            },
+            rotate: 0,
+            duration: duration,
+            easing: "easeInOutElastic"
+        })
+
+    } else {
+
+        anime({
+            targets: ".mobile-menu-body nav ul li",
+            opacity: 1,
+            easing: "linear",
+            left: 0,
+            bottom: 0,
+            delay: anime.stagger(10),
+            duration: 500
+        })
+
+        anime({
+            targets: ".mobile-menu",
+            right: 0,
+            easing: "easeInQuart",
+            height: [{
+                delay: 50,
+                value: "100%"
+            }],
+            width: [{
+                delay: 0,
+                value: "100%"
+            }],
+            borderRadius: {
+                delay: 50,
+                value: "0px 0px 0px 0px"
+            },
+            duration: 150,
+            begin: () => {
+                document.querySelector(".mobile-menu").style.display = "flex";
+            }
+        })
+
+        anime({
+            targets: ".hamburguer-mobile div:nth-child(1)",
+            top: "0.6rem",
+            rotate: {
+                delay: 400,
+                value: 45
+            },
+            duration: duration,
+            easing: "easeInOutElastic"
+        })
+    
+        anime({
+            targets: ".hamburguer-mobile div:nth-child(2)",
+            opacity: 0,
+            duration: 800,
+            endDelay: 1000
+        })
+        
+        anime({
+            targets: ".hamburguer-mobile div:nth-child(3)",
+            width: 30,
+            bottom: "0.6rem",
+            rotate: {
+                delay: 400,
+                value: -45
+            },
+            duration: duration,
+            easing: "easeInOutElastic"
+        })
+    }
+
+
+    menuMobile.value = !menuMobile.value;
+}
 </script>
 
 <template>
@@ -112,7 +243,7 @@ onMounted(() => {
             <div class="rightLinks">
                 <template v-for="link in links" class="links">
                     <template v-if="link.icon == 'faq' || link.icon == 'user'">
-                        <div v-if="link.title.en == 'Login' && !auth || link.icon == 'faq'" class="links">
+                        <div v-if="link.title.en == 'Log in' && !auth || link.icon == 'faq'" class="links">
                             <img :src="`/icons/${link.icon}.svg`" :alt="link.title[lang] + ' Icon'">
                             <RouterLink :to="{path: link.link}">{{ link.title[lang] }}</RouterLink>
                         </div>
@@ -124,10 +255,68 @@ onMounted(() => {
                 </template>
             </div>
 
-            <div class="hamburguer-mobile">
-                <svg width="32" height="24" viewBox="0 0 32 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M7.67076 23.9987L30.1937 23.9987C32.6021 24.0692 32.6021 21.2607 30.1937 21.3312L7.76053 21.3312C5.39592 21.2607 5.30396 23.9987 7.66857 23.9987H7.67076ZM30.1937 13.3322C32.5101 13.3322 32.5101 10.6665 30.1937 10.6665L17.4949 10.6665C15.1302 10.6665 15.1302 13.3322 17.4949 13.3322L30.1937 13.3322ZM30.1937 2.66578C32.5101 2.66578 32.5101 0 30.1937 0L1.73733 0C-0.579113 0 -0.579113 2.66578 1.73733 2.66578L30.1937 2.66578Z" fill="#93D4C5"/>
-                </svg>
+            <button class="hamburguer-mobile" @click="animMobile()">
+                <div></div>
+                <div></div>
+                <div></div>
+            </button>
+
+            <div class="mobile-menu">
+                <div class="mobile-menu-head">
+                    <button class="lang-selector lang-mobile" @click="showLangSelector = !showLangSelector">
+                        <p class="lang-selector-selected">{{ lang.toUpperCase() }} <img style="width: 32px;" :src="`/icons/lang/${lang}.png`" :alt="lang + 'language'"></p> 
+                            <ul v-if="showLangSelector">
+        
+                            <template v-for="language in languages">
+                        
+                                <li @click="changeLang($event)" :data-value="language.short">
+                                    {{ language.short.toUpperCase() }} <img style="width: 32px;" :src="`/icons/lang/${language.short}.png`" :alt="language.desc[lang]">
+                                </li>
+        
+                            </template>
+        
+                        </ul>
+                    </button>
+
+                    <button aria-label="Change Theme" class="change-theme-button theme-mobile" @click="setDark()">
+                        <img :src="`/icons/${icon}.svg`" :alt="`${icon} Icon`">
+                    </button>
+                </div>
+
+                <div class="mobile-menu-body">
+                    <nav>
+                        <ul>
+                            <template v-for="link in links">
+                                <template v-if="link.icon == 'user'">
+                                    <template v-if="!auth && link.title.en == 'Log in'">
+                                        <li style="order: -1;">
+                                            <img :src="`/icons/${link.icon}.svg`" :alt="link.title[lang] + ' Icon'">
+                                            <RouterLink @click="animMobile()" v-if="!auth && link.title.en == 'Log in'" :to="{path: link.link}">
+                                                {{ link.title[lang] }}
+                                            </RouterLink>
+                                        </li>
+                                    </template>
+                                        <template v-else-if="auth && link.title.en != 'Log in'">
+                                            <li>
+                                                <img :src="`/icons/${link.icon}.svg`" :alt="link.title[lang] + ' Icon'">
+                                                <RouterLink @click="animMobile()" :to="{path: link.link}">
+                                                    {{ link.title[lang] }}
+                                                </RouterLink>
+                                            </li>
+                                        </template>
+                                    </template>
+                                    <template v-else>
+                                        <li>
+                                            <img :src="`/icons/${link.icon}.svg`" :alt="link.title[lang] + ' Icon'">
+                                            <RouterLink @click="animMobile()" :to="{path: link.link}">
+                                                {{ link.title[lang] }}
+                                            </RouterLink>
+                                        </li>
+                                    </template>
+                            </template>
+                        </ul>
+                    </nav>
+                </div>  
             </div>
 
         </div>
@@ -142,6 +331,124 @@ header {
     padding: 1rem 0;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     transition: all .25s ease;
+}
+
+.hamburguer-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    align-items: end;
+    background-color: transparent;
+    border: none;
+    z-index: 3;
+}
+
+.hamburguer-mobile div {
+    height: 2px;
+    background-color: var(--darkBlueText);
+    display: block;
+    position: relative;
+    border-radius: 10px;
+}
+
+.hamburguer-mobile div:nth-child(1) {
+    width: 30px;
+}
+
+.hamburguer-mobile div:nth-child(2) {
+    width: 15px;
+}
+
+.hamburguer-mobile div:nth-child(3) {
+    width: 22px;
+}
+
+.mobile-menu {
+    transition: all .25s;
+    position: absolute;
+    background-color: var(--lightWhite);
+    height: 0;
+    width: 0;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    display: none;
+    border-radius: 0px 0px 0px 100px;
+    justify-content: center;
+    gap: 3rem;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+.mobile-menu-head {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+}
+
+.mobile-menu-body {
+    width: 100%;
+}
+
+.mobile-menu-body ul {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    padding: 0;
+    gap: 2rem;
+}
+
+.mobile-menu-body ul li {
+    opacity: 0;
+    position: relative;
+    left: -10px;
+    bottom: -10px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: flex-start;
+}
+
+.mobile-menu-body ul li a {
+    color: var(--lightRed);
+    text-decoration: none;
+    
+}
+
+.mobile-menu-body ul li::after {
+    content: "";
+    display: block;
+    width: 100%;
+    background-color: var(--darkGrey);
+    height: 1px;
+    opacity: .25;
+    position: absolute;
+    bottom: -1rem;
+    left: 0;
+}
+
+.mobile-menu-body ul li img {
+    width: 32px;
+    margin-left: 2rem;
+    object-fit: cover;
+}
+
+html[data-theme=dark] .mobile-menu {
+    background-color: var(--darkBlueHF);
+}
+
+html[data-theme=dark] .hamburguer-mobile div {
+    background-color: var(--lightRed);
+}
+
+html[data-theme=dark] .mobile-menu-body a {
+    color: var(--lightBlue);
+}
+
+html[data-theme=dark] .mobile-menu-body img {
+    filter: invert(1);
 }
 
 .header-cont {
@@ -161,6 +468,7 @@ header {
 .logo {
     display: flex;
     align-items: center;
+    z-index: 3;
 }
 
 .logo p {
@@ -185,8 +493,79 @@ header {
     border: none;
 }
 
+.theme-mobile {
+    display: block;
+    position: relative;
+    inset: 0;
+}
+
+    
 .lang-selector {
     display: none;
+    position: absolute;
+    top: 1rem;
+    left: .5rem;
+    background-color: transparent;
+    border: 1px solid var(--lightRed);
+    border-radius: 5px;
+    padding: .25rem;
+    font-size: .7rem;
+    cursor: pointer;
+}
+
+.lang-mobile {
+    display: block;
+    position: relative;
+    inset: 0;
+}
+    
+.lang-selector p {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .2rem;
+}
+
+.lang-selector p img {
+    border-radius: 2px;
+    height: 16px;
+}
+
+.lang-selector ul {
+    margin-top: 1rem;
+    padding: 0;
+    list-style: none;
+    outline: 1px solid var(--lightRed);
+    outline-offset: .25rem;
+    border-radius: 0 0 2px 2px;
+}
+
+.lang-selector ul {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.lang-selector ul li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    transition: all .25s;
+    padding: .2rem;
+}
+
+.lang-selector ul li:hover {
+    background-color: rgb(218, 211, 211);
+    border-radius: 5px;
+    scale: .95;
+}
+
+.lang-selector ul li img {
+    width: 32px;
+    object-fit: cover;
+    border-radius: 2px;
+    pointer-events: none;
 }
 
 html[data-theme=dark] body {
@@ -220,6 +599,10 @@ html[data-theme=dark] header {
 
     .header-cont {
         width: 80%;
+    }
+
+    .mobile-menu {
+        display: none !important;
     }
 
 
@@ -359,5 +742,12 @@ html[data-theme=dark] header {
     }
 }
 
+.router-link-exact-active {
+    border-bottom: 1px solid var(--darkBlueHF);
+}
+
+html[data-theme=dark] .router-link-exact-active {
+    border-color: var(--lightRed);
+}
 
 </style>
