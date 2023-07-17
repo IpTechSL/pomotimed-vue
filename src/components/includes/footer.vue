@@ -20,7 +20,7 @@ import { RouterLink } from 'vue-router';
     </footer>
 </template>
 
-<style>
+<style scoped>
 
 
 .footer-cont {
@@ -40,6 +40,7 @@ import { RouterLink } from 'vue-router';
     align-items: center;
     gap: .25rem;
     text-decoration: none;
+    color: var(--darkBlueText);
 }
 
 html[data-theme=dark] * {

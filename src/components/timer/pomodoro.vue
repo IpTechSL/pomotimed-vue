@@ -1,14 +1,13 @@
 <script setup>
 
 import Timer from 'easytimer.js';
-import { ref, onBeforeMount, onMounted, toRefs } from 'vue';
+import { ref, onBeforeMount, onMounted, toRefs, onBeforeUpdate } from 'vue';
 import anime from 'animejs';
 import axios from 'axios';
 
-
 // Variables definitions.
 let minutes = ref(25);
-let timeLeft = ref(0);
+let timeLeft = ref('25:00');
 let isActive = ref(false);
 let selectedMode = ref(1);
 let configMins = {
@@ -51,7 +50,7 @@ function generateNewChron() {
     })
     
     timer.addEventListener("targetAchieved", () => {
-        const alarm = new Audio("https://cdn.freesound.org/previews/198/198841_285997-lq.mp3");
+        const alarm = new Audio("/sounds/alarm.mp3");
         alarm.play();
         isActive.value = false;
     })
@@ -62,17 +61,17 @@ function generateNewChron() {
 function changeMode(n, event) {
     
     selectedMode.value = n;
-    switch (event.target.innerHTML) {
-        case "Pomodoro":
+    switch (event.target.dataset.type) {
+        case "1":
             minutes.value = configMins.pomodoro;
             generateNewChron();
             break;
-        case "Short break":
+        case "2":
             minutes.value = configMins.short;
             generateNewChron();
             break;
             
-        case "Long break":
+        case "3":
             minutes.value = configMins.long;
             generateNewChron();
             break;
@@ -89,17 +88,17 @@ function changeSettings() {
     if(configMins.short < 1) {configMins.short = 1} else if (configMins.short > 60) {configMins.short = 60}
     if(configMins.long < 1) {configMins.long = 1} else if (configMins.long > 60) {configMins.long = 60}
 
-    switch (document.querySelector(".selected").innerHTML) {
-        case "Pomodoro":
+    switch (document.querySelector(".selected").dataset.type) {
+        case "1":
             minutes.value = configMins.pomodoro;
             generateNewChron();
             break;
-        case "Short break":
+        case "2":
             minutes.value = configMins.short;
             generateNewChron();
             break;
             
-        case "Long break":
+        case "3":
             minutes.value = configMins.long;
             generateNewChron();
             break;
@@ -130,23 +129,21 @@ function modeAnim(instant) {
             duration: duration,
             easing: "easeInQuart"
         })
-    }, 20);
+    }, 1);
 }
 
-
-// On mounted generate the chron / listen to resize.
-onMounted(async () => {
+onBeforeMount(async () => {
     await getTranslates();
     generateNewChron();
     modeAnim();
     window.addEventListener("resize", () => {
         modeAnim(true)
     })
-
 })
 
+
 function sound() {
-    const audio = new Audio("https://cdn.freesound.org/previews/423/423957_6164481-lq.mp3");
+    const audio = new Audio("/sounds/click.mp3");
     audio.play();
 }
 
@@ -194,14 +191,15 @@ let timerLanguages = ref({
 async function getTranslates() {
     await axios({
         method: "GET",
-        url: "https://drupal.pomotimed.com/pomotimed/timer",
-        auth: {
-            username: "admin",
-            password: "admin"
-        }
+        url: "/services/timer.json"
     })
     .then(response => timerLanguages.value = response.data);
-} 
+}
+
+onBeforeUpdate(() => {
+    modeAnim();
+})
+
 </script>
 
 <template>
@@ -231,9 +229,9 @@ async function getTranslates() {
     </div>
     <div class="pomodoro-timer">
         <div class="pomodoro-timer-head">
-            <button aria-label="Pomodoro Timer Mode" @click="changeMode(1, $event)" :class="selectedMode == 1 ? 'selected' : ''">{{ timerLanguages.field_pomodoro[lang] }}</button>
-            <button aria-label="Short Break Mode" @click="changeMode(2, $event)" :class="selectedMode == 2 ? 'selected' : ''">{{ timerLanguages.field_short_break[lang] }}</button>
-            <button aria-label="Long Break Mode" @click="changeMode(3, $event)" :class="selectedMode == 3 ? 'selected' : ''">{{ timerLanguages.field_long_break[lang]}}</button>
+            <button data-type="1" aria-label="Pomodoro Timer Mode" @click="changeMode(1, $event)" :class="selectedMode == 1 ? 'selected' : ''">{{ timerLanguages.field_pomodoro[lang] }}</button>
+            <button data-type="2" aria-label="Short Break Mode" @click="changeMode(2, $event)" :class="selectedMode == 2 ? 'selected' : ''">{{ timerLanguages.field_short_break[lang] }}</button>
+            <button data-type="3" aria-label="Long Break Mode" @click="changeMode(3, $event)" :class="selectedMode == 3 ? 'selected' : ''">{{ timerLanguages.field_long_break[lang]}}</button>
             <span aria-hidden="true" class="modeLine"></span>
         </div>
         <div class="pomodoro-timer-body">
@@ -272,6 +270,7 @@ async function getTranslates() {
     justify-content: space-between;
     box-shadow: 0px 0px 7px 4px rgba(169, 67, 56, 0.24);
     max-width: 30rem;
+    z-index: 98;
 }
 
 .pomodoro-timer-settings-head h2 {
@@ -384,7 +383,6 @@ html[data-theme=dark] .pomodoro-timer-settings-body label {
     height: 2px;
     background-color: var(--lightBlue);
     position: absolute;
-    width: 20%;
     left: .5rem;
     bottom: 0;
 }
@@ -397,6 +395,7 @@ html[data-theme=dark] .pomodoro-timer-settings-body label {
     font-weight: 400;
     position: relative;
     cursor: pointer;
+    font-size: .7rem;
 }
 
 .pomodoro-timer-body {
@@ -442,6 +441,12 @@ html[data-theme=dark] .pomodoro-timer-settings-body label {
 
 .pomodoro-timer-head .selected {
     font-weight: 600;
+}
+
+@media screen and (min-width: 450px) {
+    .pomodoro-timer-head button {
+        font-size: 1rem;
+    }
 }
 
 html[data-theme=dark] .pomodoro-timer {

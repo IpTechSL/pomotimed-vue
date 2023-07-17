@@ -101,6 +101,7 @@ function deleteTask(event) {
     text-align: center;
     color: var(--darkBlueText);
     box-shadow: 0px 4px 12px 4px rgba(0, 0, 0, 0.25);
+    z-index: 99;
 }
 
 .tasks-add-info {
@@ -233,6 +234,7 @@ html[data-theme=dark] .task img {
     white-space: pre-line;
     color: var(--darkBlueText);
     padding: .5rem;
+    word-break: break-word;
     border-radius: 5px;
     box-shadow: 0px 4px 12px 4px rgba(0, 0, 0, 0.25);
 }

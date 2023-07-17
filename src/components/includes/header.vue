@@ -23,11 +23,7 @@ function setDark() {
 let links = ref([]);
 axios({
     method: "GET",
-    url: "https://drupal.pomotimed.com/pomotimed/menu/navar",
-    auth: {
-        username: "admin",
-        password: "admin"
-    }
+    url: "/services/menu-var.json",
 })
 .then(response => links.value = response.data)
 
@@ -197,27 +193,30 @@ function animMobile() {
 
     <header class="header">
     
-        <button class="lang-selector" @click="showLangSelector = !showLangSelector">
-            <p class="lang-selector-selected">{{ lang.toUpperCase() }} <img style="width: 32px;" :src="`/icons/lang/${lang}.png`" :alt="lang + 'language'"></p> 
-            <ul v-if="showLangSelector">
-    
-                <template v-for="language in languages">
-                    
-                    <li @click="changeLang($event)" :data-value="language.short">
-                        {{ language.short.toUpperCase() }} <img style="width: 32px;" :src="`/icons/lang/${language.short}.png`" :alt="language.desc[lang]">
-                    </li>
-    
-                </template>
-    
-            </ul>
-        </button>
-    
-    
-        <button aria-label="Change Theme" class="change-theme-button" @click="setDark()">
-            <img :src="`/icons/${icon}.svg`" :alt="`${icon} Icon`">
-        </button>
-
+        
         <div class="header-cont">
+
+            <div class="header-buttons">
+                <button class="lang-selector" @click="showLangSelector = !showLangSelector">
+                    <p class="lang-selector-selected"><img style="width: 32px;" :src="`/icons/lang/${lang}.png`" :alt="lang + 'language'"></p> 
+                    <ul v-if="showLangSelector">
+            
+                        <template v-for="language in languages">
+                            
+                            <li v-if="language.short != lang" @click="changeLang($event)" :data-value="language.short">
+                                <img style="width: 32px;" :src="`/icons/lang/${language.short}.png`" :alt="language.desc[lang]">
+                            </li>
+            
+                        </template>
+            
+                    </ul>
+                </button>
+            
+            
+                <button aria-label="Change Theme" class="change-theme-button" @click="setDark()">
+                    <img :src="`/icons/${icon}.svg`" :alt="`${icon} Icon`">
+                </button>
+            </div>
 
             <div class="leftLinks">
                 <template v-for="link in links" class="links">
@@ -237,8 +236,10 @@ function animMobile() {
             </div>
 
             <div class="logo">
-                <img src="@/assets/socials/simple-logo.png" alt="PomoTimed Logo">
-                <p>PomoTimed</p>
+                <RouterLink to="/">
+                    <img src="@/assets/socials/simple-logo.png" alt="PomoTimed Logo">
+                    <p>PomoTimed</p>
+                </RouterLink>
             </div>
     
             <div class="rightLinks">
@@ -256,33 +257,15 @@ function animMobile() {
                 </template>
             </div>
 
-            <button class="hamburguer-mobile" @click="animMobile()">
-                <div></div>
-                <div></div>
-                <div></div>
-            </button>
+            <div class="header-cont-buttonMobile">
+                <button class="hamburguer-mobile" @click="animMobile()">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </button>
+            </div>
 
             <div class="mobile-menu">
-                <div class="mobile-menu-head">
-                    <button class="lang-selector lang-mobile" @click="showLangSelector = !showLangSelector">
-                        <p class="lang-selector-selected">{{ lang.toUpperCase() }} <img style="width: 32px;" :src="`/icons/lang/${lang}.png`" :alt="lang + 'language'"></p> 
-                            <ul v-if="showLangSelector">
-        
-                            <template v-for="language in languages">
-                        
-                                <li @click="changeLang($event)" :data-value="language.short">
-                                    {{ language.short.toUpperCase() }} <img style="width: 32px;" :src="`/icons/lang/${language.short}.png`" :alt="language.desc[lang]">
-                                </li>
-        
-                            </template>
-        
-                        </ul>
-                    </button>
-
-                    <button aria-label="Change Theme" class="change-theme-button theme-mobile" @click="setDark()">
-                        <img :src="`/icons/${icon}.svg`" :alt="`${icon} Icon`">
-                    </button>
-                </div>
 
                 <div class="mobile-menu-body">
                     <nav>
@@ -332,6 +315,13 @@ header {
     padding: 1rem 0;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     transition: all .25s ease;
+}
+
+.header-cont-buttonMobile {
+    z-index: 3;
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .hamburguer-mobile {
@@ -452,6 +442,10 @@ html[data-theme=dark] .mobile-menu-body img {
     filter: invert(1);
 }
 
+.logo {
+    display: none;
+}
+
 .header-cont {
     width: 90%;
     margin: 0 auto;
@@ -461,24 +455,44 @@ html[data-theme=dark] .mobile-menu-body img {
     justify-content: space-between;
 }
 
+.header-buttons {
+    display: flex;
+    gap: 1rem;
+    flex: 1;
+}
+
 .leftLinks,
 .rightLinks {
     display: none;
 }
 
-.logo {
-    display: flex;
-    align-items: center;
-    z-index: 3;
-}
+@media screen and (min-width: 300px) {
+    .logo {
+        flex: 2;
+        display: flex;
+        align-items: center;
+        z-index: 3;
+        position: relative;
+        display: flex;
+        justify-content: center;
+    }
 
-.logo p {
-    color: var(--darkBlueText);
-    font-size: 1.2rem;
+    .logo .router-link-exact-active {
+        border-bottom: none !important;
+    }
 }
 
 .logo img {
-    width: 54px;
+    width: 72px;
+}
+
+.logo p {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+    color: var(--darkBlueText);
 }
 
 .hamburguer-mobile svg path {
@@ -486,24 +500,17 @@ html[data-theme=dark] .mobile-menu-body img {
 }
 
 .change-theme-button {
-    display: none;
-    position: absolute;
     right: 1rem;
     top: 1rem;
     background-color: transparent;
     border: none;
+    order: -1;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
 }
-
-.theme-mobile {
-    display: block;
-    position: relative;
-    inset: 0;
-}
-
     
 .lang-selector {
-    display: none;
-    position: absolute;
     top: 1rem;
     left: .5rem;
     background-color: transparent;
@@ -514,12 +521,6 @@ html[data-theme=dark] .mobile-menu-body img {
     cursor: pointer;
 }
 
-.lang-mobile {
-    display: block;
-    position: relative;
-    inset: 0;
-}
-    
 .lang-selector p {
     display: flex;
     align-items: center;
@@ -602,6 +603,22 @@ html[data-theme=dark] header {
         width: 80%;
     }
 
+    .header-buttons {
+        position: absolute;
+        width: 100%;
+        left: 0;
+        top: 0;
+    }
+
+    .header-cont-buttonMobile {
+        display: none;
+    }
+
+    .change-theme-button,
+    .lang-selector {
+        position: absolute;
+    }
+
     .mobile-menu {
         display: none !important;
     }
@@ -616,13 +633,6 @@ html[data-theme=dark] header {
 
     .logo img {
         width: 72px;
-    }
-
-    .logo p {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        font-weight: bold;
     }
 
     .leftLinks,
@@ -663,20 +673,11 @@ html[data-theme=dark] header {
 
     .change-theme-button {
         display: block;
-        cursor: pointer;
     }
 
     .lang-selector {
         display: block;
         position: absolute;
-        top: 1rem;
-        left: .5rem;
-        background-color: transparent;
-        border: 1px solid var(--lightRed);
-        border-radius: 5px;
-        padding: .25rem;
-        font-size: .7rem;
-        cursor: pointer;
     }
 
     .lang-selector p {

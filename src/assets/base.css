@@ -30,3 +30,7 @@ body {
   min-height: 100vh;
   transition: background-color .25s ease;
 }
+
+fieldset {
+  border: none;
+}
