@@ -2,7 +2,7 @@
 
 :root {
   --lightWhite: #FFFFED;
-  --lightRed: #EA473B;
+  --lightRed: hsla(4, 81%, 57%, 0.77);
   --lightBlue: #93D4C5;
 
   --darkBlueText: #2C3E50;
@@ -21,9 +21,16 @@
   box-sizing: border-box;
   margin: 0;
   font-weight: normal;
+  font-family: var(--primaryFont);
 }
 
 body {
   font-family: var(--primaryFont);
+  background-color: var(--lightWhite);
   min-height: 100vh;
+  transition: background-color .25s ease;
+}
+
+fieldset {
+  border: none;
 }
