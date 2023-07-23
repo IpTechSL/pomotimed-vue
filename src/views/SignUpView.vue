@@ -1,24 +1,32 @@
 <script setup>
 import axios from 'axios';
+import { RouterLink, useRouter, useRoute } from 'vue-router';
 import { onBeforeMount, ref, toRefs } from 'vue';
-import { RouterLink, useRoute, useRouter } from 'vue-router';
 
+
+// Variables
 const route = useRoute();
-let user = ref(route.params.user);
+const user = route.params.user;
 const router = useRouter();
 const token = sessionStorage.getItem('token');
 
-async function login() {
+// User Variables
+let username = ref();
+let email = ref();
+let password = ref();
+
+// Create user function
+async function signUser() {
     await axios({
         method: "POST",
-        url: "https://drupal.pomotimed.com/pomotimed/login-check",
+        url: "https://drupal.pomotimed.com/pomotimed/user",
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-Token': token
         },
         data: {
-            username: "admin",
-            password: "admin"
+            username: username.value,
+            email: email.value,
+            pass: password.value
         },
         auth: {
             username: "admin",
@@ -27,15 +35,15 @@ async function login() {
     })
     .then(response => {
         if(response.status === 200) {
-            localStorage.setItem("jwt", response.data.token);
             router.push('/')
         }
     })
-    
+
 }
 
+
 onBeforeMount(async () => {
-    await getTranslates();
+    getTranslates();
 })
 
 // Get Translations.
@@ -45,35 +53,39 @@ const props = defineProps({
 const { lang } = toRefs(props);
 
 let translations = ref();
-
 async function getTranslates() {
-    axios({
+    await axios({
         method: "GET",
         url: "/services/loginsign.json"
     })
     .then(response => translations.value = response.data);
 }
 
+
 </script>
 <template>
     <main>
-        <form v-if="translations" @submit.prevent="login()">
+        <form v-if="translations" @submit.prevent="signUser()">
+            <fieldset>
+                <label for="username">{{ translations?.username?.[lang] }}</label>
+                <input type="text" name="username" id="username" :placeholder="translations?.username?.[lang] " autocomplete="off" v-model="username">
+            </fieldset>
             <fieldset>
                 <label for="email">{{ translations?.email?.[lang] }}</label>
-                <input type="email" name="email" id="email" :placeholder="translations?.email?.[lang]" autocomplete="off">
+                <input type="email" name="email" id="email" :placeholder="translations?.email?.[lang] " autocomplete="off" v-model="email">
             </fieldset>
             <fieldset>
                 <label for="password">{{ translations?.password?.[lang] }}</label>
-                <input type="password" name="password" id="password" :placeholder="translations?.password?.[lang] ">
+                <input type="password" name="password" id="password" :placeholder="translations?.password?.[lang] " v-model="password">
             </fieldset>
-            <input type="submit" :value="translations?.login?.[lang] ">
+            <input type="submit" :value="translations?.sign?.[lang] ">
         </form>
         <div class="links-helpers">
             <RouterLink to="/">
                 {{ translations?.helper_forgot?.[lang] }}
             </RouterLink>            
-            <RouterLink :to="{name: 'sign up'}">
-                {{ translations?.sign?.[lang] }}
+            <RouterLink :to="{name: 'login'}">
+                {{ translations?.login?.[lang] }}
             </RouterLink>            
         </div>
     </main>

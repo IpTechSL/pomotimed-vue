@@ -4,6 +4,7 @@ import Timer from 'easytimer.js';
 import { ref, onBeforeMount, onMounted, toRefs, onBeforeUpdate } from 'vue';
 import anime from 'animejs';
 import axios from 'axios';
+import { onBeforeRouteLeave } from 'vue-router';
 
 // Variables definitions.
 let minutes = ref(25);
@@ -136,9 +137,11 @@ onBeforeMount(async () => {
     await getTranslates();
     generateNewChron();
     modeAnim();
-    window.addEventListener("resize", () => {
-        modeAnim(true)
-    })
+    window.addEventListener("resize", modeAnim);
+})
+
+onBeforeRouteLeave(() => {
+    window.removeEventListener("resize", modeAnim);
 })
 
 
@@ -191,7 +194,7 @@ let timerLanguages = ref({
 async function getTranslates() {
     await axios({
         method: "GET",
-        url: "/services/timer.json"
+        url: "/services/Timer.json"
     })
     .then(response => timerLanguages.value = response.data);
 }

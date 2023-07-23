@@ -1,11 +1,20 @@
 <script setup>
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRoute } from 'vue-router';
 import axios from 'axios';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import anime from 'animejs';
+import router from '../../router';
 
 let icon = ref("moon");
 let dark = true;
+
+const route = useRoute();
+let user = ref(route.params.user);
+
+watch(route, async () => {
+    user.value = route.params.user;
+})
+
 function setDark() {
     if(!dark) {
         icon.value = 'moon';
@@ -23,14 +32,13 @@ function setDark() {
 let links = ref([]);
 axios({
     method: "GET",
-    url: "/services/menu-var.json",
+    url: "/services/navar.json",
 })
 .then(response => links.value = response.data)
 
 const navLang = navigator.language.split("-");
 document.documentElement.lang = navLang[0]
 const lang = ref(document.documentElement.lang);
-const auth = false;
 const showLangSelector = ref(false);
 
 const emit = defineEmits(["lang"]);
@@ -187,10 +195,15 @@ function animMobile() {
 
     menuMobile.value = !menuMobile.value;
 }
+
+function logOut() {
+    localStorage.removeItem('jwt');
+    router.push('/');
+}
 </script>
 
 <template>
-
+    <button style="position: absolute; top: 7rem; left: 3rem;" @click="logOut()">Cerrar sesión</button>
     <header class="header">
     
         
@@ -245,11 +258,11 @@ function animMobile() {
             <div class="rightLinks">
                 <template v-for="link in links" class="links">
                     <template v-if="link.icon == 'faq' || link.icon == 'user'">
-                        <div v-if="link.title.en == 'Log in' && !auth || link.icon == 'faq'" class="links">
+                        <div v-if="link.title.en == 'Log in' && !user.uid || link.icon == 'faq'" class="links">
                             <img :src="`/icons/${link.icon}.svg`" :alt="link.title[lang] + ' Icon'">
                             <RouterLink :to="{path: link.link}">{{ link.title[lang] }}</RouterLink>
                         </div>
-                        <div style="order: 2;" v-else-if="link.title.en == 'Profile' && auth" class="links">
+                        <div style="order: 2;" v-else-if="link.title.en == 'Profile' && user.uid" class="links">
                             <img :src="`/icons/${link.icon}.svg`" :alt="link.title[lang] + ' Icon'">
                             <RouterLink :to="{path: link.link}">{{ link.title[lang] }}</RouterLink>
                         </div>
@@ -272,15 +285,15 @@ function animMobile() {
                         <ul>
                             <template v-for="link in links">
                                 <template v-if="link.icon == 'user'">
-                                    <template v-if="!auth && link.title.en == 'Log in'">
+                                    <template v-if="!user.uid && link.title.en == 'Log in'">
                                         <li style="order: -1;">
                                             <img :src="`/icons/${link.icon}.svg`" :alt="link.title[lang] + ' Icon'">
-                                            <RouterLink @click="animMobile()" v-if="!auth && link.title.en == 'Log in'" :to="{path: link.link}">
+                                            <RouterLink @click="animMobile()" v-if="!user.uid && link.title.en == 'Log in'" :to="{path: link.link}">
                                                 {{ link.title[lang] }}
                                             </RouterLink>
                                         </li>
                                     </template>
-                                        <template v-else-if="auth && link.title.en != 'Log in'">
+                                        <template v-else-if="user.uid && link.title.en != 'Log in'">
                                             <li>
                                                 <img :src="`/icons/${link.icon}.svg`" :alt="link.title[lang] + ' Icon'">
                                                 <RouterLink @click="animMobile()" :to="{path: link.link}">
