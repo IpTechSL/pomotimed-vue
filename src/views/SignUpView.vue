@@ -11,12 +11,26 @@ const router = useRouter();
 const token = sessionStorage.getItem('token');
 
 // User Variables
-let username = ref();
-let email = ref();
-let password = ref();
+let userData = ref({
+    username: ref(''),
+    email: ref(''),
+    password: ref(''),
+    checkPerms: ref(false),
+    validUser: ref(false)
+});
+
+// Validate Fields.
+function validateFields() {
+    if(userData.value.username.length > 0 && userData.value.email.length > 0 && userData.value.password.length > 0 && userData.value.checkPerms == true ) {
+        userData.value.validUser = true;
+    } else {
+        userData.value.validUser = false;
+    }
+}
 
 // Create user function
 async function signUser() {
+    console.log("Peticion")
     await axios({
         method: "POST",
         url: "https://drupal.pomotimed.com/pomotimed/user",
@@ -61,24 +75,34 @@ async function getTranslates() {
     .then(response => translations.value = response.data);
 }
 
-
 </script>
 <template>
     <main>
         <form v-if="translations" @submit.prevent="signUser()">
             <fieldset>
                 <label for="username">{{ translations?.username?.[lang] }}</label>
-                <input type="text" name="username" id="username" :placeholder="translations?.username?.[lang] " autocomplete="off" v-model="username">
+                <input type="text" name="username" id="username" :placeholder="translations?.username?.[lang] " autocomplete="off" v-model="userData.username" v-on:input="validateFields()">
             </fieldset>
             <fieldset>
                 <label for="email">{{ translations?.email?.[lang] }}</label>
-                <input type="email" name="email" id="email" :placeholder="translations?.email?.[lang] " autocomplete="off" v-model="email">
+                <input type="email" name="email" id="email" :placeholder="translations?.email?.[lang] " autocomplete="off" v-model="userData.email" v-on:input="validateFields()">
             </fieldset>
             <fieldset>
                 <label for="password">{{ translations?.password?.[lang] }}</label>
-                <input type="password" name="password" id="password" :placeholder="translations?.password?.[lang] " v-model="password">
+                <input type="password" name="password" id="password" :placeholder="translations?.password?.[lang] " v-model="userData.password" v-on:input="validateFields()">
             </fieldset>
-            <input type="submit" :value="translations?.sign?.[lang] ">
+            <fieldset class="permsField">
+                <div class="permsField-checkbox">
+                    <input type="checkbox" name="perms" id="perms" v-model="userData.checkPerms" v-on:change="validateFields()" required>
+                    <span class="permsField-span"></span>
+                </div>
+                <label for="perms">I agree with the 
+                    <RouterLink to="/">Terms of Service</RouterLink>
+                    and
+                    <RouterLink to="/">Legal Advice</RouterLink>
+                </label>
+            </fieldset>
+            <input type="submit" :value="translations?.sign?.[lang]" :disabled="!userData.validUser" @click="console.log('hola')">
         </form>
         <div class="links-helpers">
             <RouterLink to="/">
@@ -154,7 +178,80 @@ form input[type=submit] {
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     border-radius: 10px;
     font-size: 1rem;
+    transition: all .1s ease-in-out;
+}
 
+form input[type=submit]:disabled {
+    opacity: .5;
+    scale: .98;
+    cursor: not-allowed;
+}
+
+.permsField {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.permsField input {
+    opacity: 0;
+}
+
+.permsField > * {
+    width: fit-content;
+}
+
+.permsField-checkbox {
+    position: relative;
+}
+
+.permsField-checkbox span {
+    border-radius: 3px;
+    outline: 1px solid var(--darkBlueText);
+    outline-offset: .15rem;
+    background-color: var(--lightRed);
+    height: 14px;
+    width: 14px;
+    position: relative;
+    transition: all .15s ease;
+    display: block;
+}
+.permsField-checkbox input:checked ~ .permsField-span {
+    background-color: #2c3e50;
+    outline-offset: 0;
+    width: 16px;
+    height: 16px;
+}
+
+.permsField-checkbox .permsField-span::after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.permsField-checkbox input:checked ~ .permsField-span::after {
+    display: inline-block;
+    left: 35%;
+    transform: rotate(45deg);
+    height: 14px;
+    width: 7px;
+    border-bottom: 3px solid red;
+    border-right: 3px solid red;
+}
+
+.permsField input[type=checkbox] {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+}
+
+.permsField label {
+    font-size: .7rem;
+}
+
+.permsField label a {
+    color: var(--darkBlueHF);
 }
 
 .links-helpers {
@@ -162,6 +259,7 @@ form input[type=submit] {
     justify-content: space-between;
     width: 90%;
     max-width: 25rem;
+    gap: 0.35rem;
 }
 
 .links-helpers a {
@@ -177,6 +275,25 @@ html[data-theme=dark] form fieldset label {
 html[data-theme=dark] form fieldset input {
     color: var(--lightWhite);
     border-color: var(--lightBlue);
+}
+
+html[data-theme=dark] .permsField label a {
+    color: var(--lightBlue);
+}
+
+html[data-theme=dark] .permsField-checkbox span {
+    background-color: var(--lightBlue);
+    outline-color: var(--lightRed);
+}
+
+html[data-theme=dark] .permsField-checkbox input:checked ~ .permsField-span  {
+    background-color: var(--lightWhite);
+    outline-color: var(--lightWhite);
+}
+
+html[data-theme=dark] .permsField-checkbox input:checked ~ .permsField-span::after  {
+    border-bottom-color: var(--darkBlueText);
+    border-right-color: var(--darkBlueText);
 }
 
 html[data-theme=dark] form fieldset input:focus-within,

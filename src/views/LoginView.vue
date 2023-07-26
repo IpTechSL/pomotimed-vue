@@ -150,6 +150,7 @@ form input[type=submit] {
     justify-content: space-between;
     width: 90%;
     max-width: 25rem;
+    gap: 0.35rem;
 }
 
 .links-helpers a {

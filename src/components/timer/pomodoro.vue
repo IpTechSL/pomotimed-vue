@@ -1,7 +1,7 @@
 <script setup>
 
 import Timer from 'easytimer.js';
-import { ref, onBeforeMount, onMounted, toRefs, onBeforeUpdate } from 'vue';
+import { ref, onBeforeMount, onMounted, toRefs, onBeforeUpdate, onUpdated } from 'vue';
 import anime from 'animejs';
 import axios from 'axios';
 import { onBeforeRouteLeave } from 'vue-router';
@@ -133,10 +133,9 @@ function modeAnim(instant) {
     }, 1);
 }
 
-onBeforeMount(async () => {
+onMounted(async () => {
     await getTranslates();
     generateNewChron();
-    modeAnim();
     window.addEventListener("resize", modeAnim);
 })
 
@@ -151,55 +150,18 @@ function sound() {
 }
 
 
-let timerLanguages = ref({ 
-    "field_timer_state_start": { 
-        "en": "Start", 
-        "es": "Iniciar" 
-    }, 
-    "field_timer_state_stop": { 
-        "en": "Pause", 
-        "es": "Pausar" 
-    }, 
-    "field_pomodoro": { 
-        "en": "Pomodoro", 
-        "es": "Pomodoro" 
-    }, 
-    "field_long_break": { 
-        "en": "Long break", 
-        "es": "Descanso largo" 
-    }, 
-    "field_short_break": { 
-        "en": "Short break", 
-        "es": "Descanso corto" 
-    }, 
-    "field_settings_pomodoro": { 
-        "en": "Pomodoro minutes", 
-        "es": "Minutos de pomodoro" 
-    }, 
-    "field_settings_long": { 
-        "en": "Long break minutes", 
-        "es": "Minutos de descanso largo" 
-    },
-    "field_settings": {
-        "en": "Settings",
-        "es": "Ajustes"
-    },
-    "field_settings_short": { 
-        "en": "Short break minutes", 
-        "es": "Minutos de descanso corto" 
-    }, "field_settings_max": {
-         "en": "Maximum amount", 
-         "es": "Cantidad máxima" }
-    });
+let timerLanguages = ref();
 async function getTranslates() {
     await axios({
         method: "GET",
         url: "/services/Timer.json"
     })
     .then(response => timerLanguages.value = response.data);
+
+    modeAnim();
 }
 
-onBeforeUpdate(() => {
+onUpdated(() => {
     modeAnim();
 })
 
@@ -230,7 +192,7 @@ onBeforeUpdate(() => {
             <img @click="changeSettings()" src="/icons/tick.svg" alt="Tick Icon">
         </div>
     </div>
-    <div class="pomodoro-timer">
+    <div v-if="timerLanguages" class="pomodoro-timer">
         <div class="pomodoro-timer-head">
             <button data-type="1" aria-label="Pomodoro Timer Mode" @click="changeMode(1, $event)" :class="selectedMode == 1 ? 'selected' : ''">{{ timerLanguages.field_pomodoro[lang] }}</button>
             <button data-type="2" aria-label="Short Break Mode" @click="changeMode(2, $event)" :class="selectedMode == 2 ? 'selected' : ''">{{ timerLanguages.field_short_break[lang] }}</button>

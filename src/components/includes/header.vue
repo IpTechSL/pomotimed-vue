@@ -203,7 +203,7 @@ function logOut() {
 </script>
 
 <template>
-    <button style="position: absolute; top: 7rem; left: 3rem;" @click="logOut()">Cerrar sesión</button>
+    <button style="position: absolute; top: 7rem; left: 3rem; opacity: .25;" @click="logOut()">Cerrar sesión</button>
     <header class="header">
     
         

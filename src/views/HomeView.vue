@@ -13,6 +13,6 @@ const { lang } = toRefs(props);
 <template>
   <main>
     <PomodoroTimer :lang="lang" />
-    <Tasks />
+    <Tasks :lang="lang" />
   </main>
 </template>
