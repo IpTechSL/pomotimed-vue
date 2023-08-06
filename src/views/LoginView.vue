@@ -1,13 +1,26 @@
 <script setup>
 import axios from 'axios';
 import { onBeforeMount, ref, toRefs } from 'vue';
-import { RouterLink, useRoute, useRouter } from 'vue-router';
+import { RouterLink, useRouter } from 'vue-router';
 
-const route = useRoute();
-let user = ref(route.params.user);
 const router = useRouter();
 const token = sessionStorage.getItem('token');
 
+// User Variables
+let userData = ref({
+    username: ref(''),
+    password: ref(''),
+    validUser: ref(false)
+});
+
+// Validate Fields.
+function validateFields() {
+    if(userData.value.username.length > 0 && userData.value.password.length > 0 ) {
+        userData.value.validUser = true;
+    } else {
+        userData.value.validUser = false;
+    }
+}
 async function login() {
     await axios({
         method: "POST",
@@ -17,8 +30,8 @@ async function login() {
             'X-CSRF-Token': token
         },
         data: {
-            username: "admin",
-            password: "admin"
+            username: userData.value.username,
+            password: userData.value.password
         },
         auth: {
             username: "admin",
@@ -59,14 +72,14 @@ async function getTranslates() {
     <main>
         <form v-if="translations" @submit.prevent="login()">
             <fieldset>
-                <label for="email">{{ translations?.email?.[lang] }}</label>
-                <input type="email" name="email" id="email" :placeholder="translations?.email?.[lang]" autocomplete="off">
+                <label for="username">{{ translations?.username?.[lang] }} <span>*</span></label>
+                <input v-model="userData.username" type="username" name="username" id="username" :placeholder="translations?.username?.[lang]" autocomplete="off" v-on:input="validateFields()">
             </fieldset>
             <fieldset>
-                <label for="password">{{ translations?.password?.[lang] }}</label>
-                <input type="password" name="password" id="password" :placeholder="translations?.password?.[lang] ">
+                <label for="password">{{ translations?.password?.[lang] }} <span>*</span></label>
+                <input v-model="userData.password" type="password" name="password" id="password" :placeholder="translations?.password?.[lang]"  v-on:input="validateFields()">
             </fieldset>
-            <input type="submit" :value="translations?.login?.[lang] ">
+            <input type="submit" :value="translations?.login?.[lang]" :disabled="!userData.validUser">
         </form>
         <div class="links-helpers">
             <RouterLink to="/">
@@ -100,6 +113,12 @@ form {
     margin-top: 1rem;
 }
 
+form input[type=submit]:disabled {
+    opacity: .7;
+    scale: .98;
+    cursor: not-allowed;
+}
+
 form fieldset {
     display: flex;
     flex-direction: column;
@@ -111,6 +130,10 @@ form fieldset label {
     text-align: center;
     font-weight: bold;
     color: var(--darkBlueText);
+}
+
+form fieldset label span {
+    color: var(--lightRed);
 }
 
 form fieldset input {

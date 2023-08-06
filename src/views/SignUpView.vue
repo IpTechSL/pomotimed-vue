@@ -30,7 +30,6 @@ function validateFields() {
 
 // Create user function
 async function signUser() {
-    console.log("Peticion")
     await axios({
         method: "POST",
         url: "https://drupal.pomotimed.com/pomotimed/user",
@@ -48,7 +47,8 @@ async function signUser() {
         }
     })
     .then(response => {
-        if(response.status === 200) {
+        console.log(response.data)
+        if(response.status === 201) {
             router.push('/')
         }
     })
@@ -80,15 +80,15 @@ async function getTranslates() {
     <main>
         <form v-if="translations" @submit.prevent="signUser()">
             <fieldset>
-                <label for="username">{{ translations?.username?.[lang] }}</label>
+                <label for="username">{{ translations?.username?.[lang] }} <span>*</span></label>
                 <input type="text" name="username" id="username" :placeholder="translations?.username?.[lang] " autocomplete="off" v-model="userData.username" v-on:input="validateFields()">
             </fieldset>
             <fieldset>
-                <label for="email">{{ translations?.email?.[lang] }}</label>
+                <label for="email">{{ translations?.email?.[lang] }} <span>*</span></label>
                 <input type="email" name="email" id="email" :placeholder="translations?.email?.[lang] " autocomplete="off" v-model="userData.email" v-on:input="validateFields()">
             </fieldset>
             <fieldset>
-                <label for="password">{{ translations?.password?.[lang] }}</label>
+                <label for="password">{{ translations?.password?.[lang] }} <span>*</span></label>
                 <input type="password" name="password" id="password" :placeholder="translations?.password?.[lang] " v-model="userData.password" v-on:input="validateFields()">
             </fieldset>
             <fieldset class="permsField">
@@ -96,10 +96,7 @@ async function getTranslates() {
                     <input type="checkbox" name="perms" id="perms" v-model="userData.checkPerms" v-on:change="validateFields()" required>
                     <span class="permsField-span"></span>
                 </div>
-                <label for="perms">I agree with the 
-                    <RouterLink to="/">Terms of Service</RouterLink>
-                    and
-                    <RouterLink to="/">Legal Advice</RouterLink>
+                <label for="perms" class="termsText" v-html="translations?.terms?.[lang]">
                 </label>
             </fieldset>
             <input type="submit" :value="translations?.sign?.[lang]" :disabled="!userData.validUser" @click="console.log('hola')">
@@ -149,6 +146,10 @@ form fieldset label {
     color: var(--darkBlueText);
 }
 
+form fieldset label span {
+    color: var(--lightRed);
+}
+
 form fieldset input {
     border: none;
     background-color: transparent;
@@ -182,7 +183,7 @@ form input[type=submit] {
 }
 
 form input[type=submit]:disabled {
-    opacity: .5;
+    opacity: .7;
     scale: .98;
     cursor: not-allowed;
 }
@@ -210,7 +211,6 @@ form input[type=submit]:disabled {
     border-radius: 3px;
     outline: 1px solid var(--darkBlueText);
     outline-offset: .15rem;
-    background-color: var(--lightRed);
     height: 14px;
     width: 14px;
     position: relative;
@@ -247,11 +247,8 @@ form input[type=submit]:disabled {
 }
 
 .permsField label {
-    font-size: .7rem;
-}
-
-.permsField label a {
     color: var(--darkBlueHF);
+    font-size: .7rem;
 }
 
 .links-helpers {
@@ -282,7 +279,6 @@ html[data-theme=dark] .permsField label a {
 }
 
 html[data-theme=dark] .permsField-checkbox span {
-    background-color: var(--lightBlue);
     outline-color: var(--lightRed);
 }
 
@@ -311,4 +307,14 @@ html[data-theme=dark] .links-helpers a {
     color: var(--lightWhite);
 }
 
+</style>
+
+<style>
+.termsText a {
+    color: var(--darkBlueHF);
+}
+
+html[data-theme=dark] .termsText a {
+    color: var(--lightWhite);
+}
 </style>

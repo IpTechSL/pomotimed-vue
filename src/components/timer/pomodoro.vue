@@ -1,7 +1,7 @@
 <script setup>
 
 import Timer from 'easytimer.js';
-import { ref, onBeforeMount, onMounted, toRefs, onBeforeUpdate, onUpdated } from 'vue';
+import { ref, onMounted, toRefs, onUpdated } from 'vue';
 import anime from 'animejs';
 import axios from 'axios';
 import { onBeforeRouteLeave } from 'vue-router';
@@ -214,9 +214,23 @@ onUpdated(() => {
             </button>
         </div>
     </div>
+
+    <div v-else class="placeholder-timer"></div>
+
 </template>
 
 <style>
+
+.placeholder-timer {
+    background-color: var(--lightRed);
+    max-width: 50rem;
+    width: 95%;
+    margin: 2rem auto;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0px 0px 7px 4px rgba(169, 67, 56, 0.24);
+    height: 14rem;
+}
 
 .pomodoro-timer-settings {
     position: absolute;
