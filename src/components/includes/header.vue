@@ -71,7 +71,6 @@ onMounted(() => {
 
     try {
         dark.value = JSON.parse(localStorage.getItem("darkMode"));
-        console.log(dark.value);
         document.documentElement.dataset.theme = dark.value ? 'dark' : 'light';
     } catch (error) {
         

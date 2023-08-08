@@ -164,7 +164,6 @@ form fieldset {
 
 form fieldset label {
     text-align: center;
-    font-weight: bold;
     color: var(--darkBlueText);
 }
 
@@ -194,7 +193,6 @@ form input[type=submit] {
     cursor: pointer;
     padding: .5rem;
     place-self: center;
-    font-weight: bold;
     color: var(--darkBlueText);
     border: none;
     background: #FF7F75;
@@ -282,7 +280,6 @@ form input[type=submit]:disabled {
 }
 
 .links-helpers a {
-    font-weight: bold;
     color: var(--darkBlueText);
     text-decoration: none;
 }

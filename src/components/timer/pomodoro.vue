@@ -19,6 +19,26 @@ let configMins = {
 let settingsState = ref(false);
 let timer;
 
+function closeOnClickOut(event) {
+    if(event.target.id === "app") {
+        changeSettings();
+        document.removeEventListener("click", closeOnClickOut);
+        document.body.classList.remove('tasks-add-blur');
+    }
+}
+
+function showSettings() {
+    settingsState.value = true;
+    document.body.classList.add('tasks-add-blur');
+    document.addEventListener("click", closeOnClickOut)
+}
+
+function closeSettings() {
+    settingsState.value = false;
+    document.body.classList.remove('tasks-add-blur');
+    changeSettings();
+}
+
 const props = defineProps({
     lang: String
 });
@@ -79,8 +99,8 @@ function changeMode(n, event) {
         default:
             break;
         }
-                modeAnim();
-            }
+            modeAnim();
+        }
             
 // Apply changge settings.
 function changeSettings() {
@@ -189,7 +209,7 @@ onUpdated(() => {
         </div>
 
         <div class="pomodoro-timer-settings-footer">
-            <img @click="changeSettings()" src="/icons/tick.svg" alt="Tick Icon">
+            <img @click="closeSettings()" src="/icons/tick.svg" alt="Tick Icon">
         </div>
     </div>
     <div v-if="timerLanguages" class="pomodoro-timer">
@@ -205,7 +225,7 @@ onUpdated(() => {
 
         <div class="pomodoro-timer-footer">
 
-            <button aria-label="Config Timer" @click="settingsState = true;">
+            <button aria-label="Config Timer" @click="showSettings()">
                 <img src="@/assets/icons/settings.svg" alt="Config timer Icon">
             </button>
             <button aria-label="Start or Pause Timer" @click="changeChronState(); sound()">{{ isActive ? timerLanguages.field_timer_state_stop[lang] : timerLanguages.field_timer_state_start[lang] }}</button>
