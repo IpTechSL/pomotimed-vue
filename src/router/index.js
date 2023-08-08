@@ -58,7 +58,7 @@ async function getUser() {
     })
     .then(response => {
         if(response.status === 200) {
-          user = response.data.data
+          user = response.data.data;
         } else {
           user = false;
         }

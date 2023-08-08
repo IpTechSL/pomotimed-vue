@@ -19,6 +19,11 @@ let userData = ref({
     validUser: ref(false)
 });
 
+// Status variables
+
+let errorOnSign = ref(false);
+let showStatus = ref(false);
+
 // Validate Fields.
 function validateFields() {
     if(userData.value.username.length > 0 && userData.value.email.length > 0 && userData.value.password.length > 0 && userData.value.checkPerms == true ) {
@@ -30,6 +35,7 @@ function validateFields() {
 
 // Create user function
 async function signUser() {
+    userData.value.validUser = false;
     await axios({
         method: "POST",
         url: "https://drupal.pomotimed.com/pomotimed/user",
@@ -47,10 +53,23 @@ async function signUser() {
         }
     })
     .then(response => {
-        console.log(response.data)
+        showStatus.value = true;
         if(response.status === 201) {
-            router.push('/')
+            errorOnSign.value = false;
+            setTimeout(() => {
+                router.push('/login');
+            }, 1500);
+        } else {
+            errorOnSign.value = true;
         }
+    })
+    .catch((error) => {
+        showStatus.value = true;
+        errorOnSign.value = true;
+
+        setTimeout(() => {
+            showStatus.value = false;
+        }, 3000);
     })
 
 }
@@ -78,6 +97,9 @@ async function getTranslates() {
 </script>
 <template>
     <main>
+        <div v-if="showStatus" class="status" :class="errorOnSign ? 'error' : 'success'">
+            <p>User created successfully. Redirecting to log in...</p>
+        </div>
         <form v-if="translations" @submit.prevent="signUser()">
             <fieldset>
                 <label for="username">{{ translations?.username?.[lang] }} <span>*</span></label>
@@ -99,7 +121,7 @@ async function getTranslates() {
                 <label for="perms" class="termsText" v-html="translations?.terms?.[lang]">
                 </label>
             </fieldset>
-            <input type="submit" :value="translations?.sign?.[lang]" :disabled="!userData.validUser" @click="console.log('hola')">
+            <input type="submit" :value="translations?.sign?.[lang]" :disabled="!userData.validUser">
         </form>
         <div class="links-helpers">
             <RouterLink to="/">
@@ -263,6 +285,33 @@ form input[type=submit]:disabled {
     font-weight: bold;
     color: var(--darkBlueText);
     text-decoration: none;
+}
+
+.status {
+    border-radius: 5px;
+    padding: 1rem;
+    outline-offset: -.2rem;
+    outline-color: var(--lightWhite);
+    outline-style: solid;
+    outline-width: 2px;
+    color: var(--darkBlueText);
+}
+
+.error {
+    background-color: var(--lightRed);
+}
+
+.success {
+    background-color: rgb(129, 199, 25);
+}
+
+html[data-theme=dark] .error {
+    color: var(--lightWhite);
+    outline-color: var(--darkGrey);
+}
+
+html[data-theme=dark] .success {
+    outline-color: var(--darkGrey);
 }
 
 html[data-theme=dark] form fieldset label {
