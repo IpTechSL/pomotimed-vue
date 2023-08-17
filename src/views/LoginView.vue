@@ -1,14 +1,32 @@
 <script setup>
 import axios from 'axios';
 import { onBeforeMount, ref, toRefs } from 'vue';
-import { RouterLink, useRoute, useRouter } from 'vue-router';
+import { RouterLink, useRouter } from 'vue-router';
 
-const route = useRoute();
-let user = ref(route.params.user);
 const router = useRouter();
 const token = sessionStorage.getItem('token');
 
+// User Variables
+let userData = ref({
+    username: ref(''),
+    password: ref(''),
+    validUser: ref(false)
+});
+
+// Show Error 
+
+let showError = ref(false);
+
+// Validate Fields.
+function validateFields() {
+    if(userData.value.username.length > 0 && userData.value.password.length > 0 ) {
+        userData.value.validUser = true;
+    } else {
+        userData.value.validUser = false;
+    }
+}
 async function login() {
+    showError.value = false;
     await axios({
         method: "POST",
         url: "https://drupal.pomotimed.com/pomotimed/login-check",
@@ -17,19 +35,20 @@ async function login() {
             'X-CSRF-Token': token
         },
         data: {
-            username: "admin",
-            password: "admin"
-        },
-        auth: {
-            username: "admin",
-            password: "admin"
+            username: userData.value.username,
+            password: userData.value.password
         }
     })
     .then(response => {
         if(response.status === 200) {
             localStorage.setItem("jwt", response.data.token);
             router.push('/')
-        }
+        } else {
+            showError.value = true;
+        }   
+    })
+    .catch((error) => {
+        showError.value = true;
     })
     
 }
@@ -57,16 +76,19 @@ async function getTranslates() {
 </script>
 <template>
     <main>
+        <div class="error" v-if="showError">
+            <p>{{ translations?.loginerror?.[lang] }}</p>
+        </div>
         <form v-if="translations" @submit.prevent="login()">
             <fieldset>
-                <label for="email">{{ translations?.email?.[lang] }}</label>
-                <input type="email" name="email" id="email" :placeholder="translations?.email?.[lang]" autocomplete="off">
+                <label for="username">{{ translations?.username?.[lang] }} <span>*</span></label>
+                <input v-model="userData.username" type="username" name="username" id="username" :placeholder="translations?.username?.[lang]" autocomplete="off" v-on:input="validateFields()">
             </fieldset>
             <fieldset>
-                <label for="password">{{ translations?.password?.[lang] }}</label>
-                <input type="password" name="password" id="password" :placeholder="translations?.password?.[lang] ">
+                <label for="password">{{ translations?.password?.[lang] }} <span>*</span></label>
+                <input v-model="userData.password" type="password" name="password" id="password" :placeholder="translations?.password?.[lang]"  v-on:input="validateFields()">
             </fieldset>
-            <input type="submit" :value="translations?.login?.[lang] ">
+            <input type="submit" :value="translations?.login?.[lang]" :disabled="!userData.validUser">
         </form>
         <div class="links-helpers">
             <RouterLink to="/">
@@ -100,6 +122,12 @@ form {
     margin-top: 1rem;
 }
 
+form input[type=submit]:disabled {
+    opacity: .7;
+    scale: .98;
+    cursor: not-allowed;
+}
+
 form fieldset {
     display: flex;
     flex-direction: column;
@@ -109,8 +137,11 @@ form fieldset {
 
 form fieldset label {
     text-align: center;
-    font-weight: bold;
     color: var(--darkBlueText);
+}
+
+form fieldset label span {
+    color: var(--lightRed);
 }
 
 form fieldset input {
@@ -135,7 +166,7 @@ form input[type=submit] {
     cursor: pointer;
     padding: .5rem;
     place-self: center;
-    font-weight: bold;
+    font-weight: normal;
     color: var(--darkBlueText);
     border: none;
     background: #FF7F75;
@@ -150,12 +181,28 @@ form input[type=submit] {
     justify-content: space-between;
     width: 90%;
     max-width: 25rem;
+    gap: 0.35rem;
 }
 
 .links-helpers a {
-    font-weight: bold;
     color: var(--darkBlueText);
     text-decoration: none;
+}
+
+.error {
+    background-color: var(--lightRed);
+    padding: 1rem;
+    border-radius: 5px;
+    outline-offset: -.2rem;
+    outline-color: var(--lightWhite);
+    outline-style: solid;
+    outline-width: 2px;
+    color: var(--darkBlueText);
+}
+
+html[data-theme=dark] .error {
+    color: var(--lightWhite);
+    outline-color: var(--lightBlue);
 }
 
 html[data-theme=dark] form fieldset label {

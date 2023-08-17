@@ -1,6 +1,8 @@
 <script setup>
-import { ref } from 'vue';
+import { isMemoSame, onBeforeMount, ref, toRefs } from 'vue';
+import axios from 'axios';
 
+// Tasks. 
 var localSto = JSON.parse(localStorage.getItem("tasks"));
 if(localSto == null) {
     localSto = [];
@@ -9,17 +11,40 @@ if(localSto == null) {
 let taskList = ref(localSto);
 let showAdd = ref(false);
 let taskDescHolder = ref("");
+let showError = ref(false);
 
 function cancelAddTask() {
     showAdd.value = false;
     taskDescHolder.value = "";
+    document.body.classList.remove('tasks-add-blur');
+    showError.value = false;
+}
+
+function closeOnClickOut(event) {
+    if(event.target.id === "app") {
+        cancelAddTask();
+        document.removeEventListener("click", closeOnClickOut);
+    }
+}
+
+function showAddMenu() {
+    showAdd.value = true; 
+    document.body.classList.add('tasks-add-blur');
+    document.addEventListener("click", closeOnClickOut)
 }
 
 function addTask() {
+    if(taskDescHolder.value.length < 1) {
+        isEmptyWarning();
+        return
+    }
     taskList.value.push(taskDescHolder.value);
     taskDescHolder.value = "";
     showAdd.value = false;
-    localStorage.setItem("tasks", JSON.stringify(taskList.value))
+    localStorage.setItem("tasks", JSON.stringify(taskList.value));
+    showError.value = false;
+    document.body.classList.remove('tasks-add-blur');
+    document.removeEventListener("click", closeOnClickOut);
 }
 
 function deleteTask(event) {
@@ -33,14 +58,38 @@ function deleteTask(event) {
     }
 }
 
+function isEmptyWarning() {
+    showError.value = true;
+}
+
+
+// Translations. 
+onBeforeMount(() => {
+    getTranslates();
+})
+
+
+const props = defineProps({
+    lang: String
+});
+const { lang } = toRefs(props);
+
+let tasksLanguages = ref();
+async function getTranslates() {
+    await axios({
+        method: "GET",
+        url: "/services/tasks.json"
+    })
+    .then(response => tasksLanguages.value = response.data);
+}
 </script>
 <template>
     <section class="tasks">
-
         <div v-if="showAdd" class="tasks-add">
-            <h2>Add task</h2>
+            <h2>{{ tasksLanguages?.add?.[lang] }}</h2>
             <div class="tasks-add-info">
-                <label for="addtask">Task description</label>
+                <label for="addtask">{{ tasksLanguages?.description?.[lang] }}</label>
+                <p class="task-add-info-error" v-if="showError">{{ tasksLanguages.empty[lang] }}</p>
                 <textarea rows="5" name="addtask" id="addtask" v-model="taskDescHolder"></textarea>
             </div>
 
@@ -56,16 +105,16 @@ function deleteTask(event) {
             </div>
         </div>
 
-        <div class="tasks-head">
-            <h1>Tasks</h1>
-            <button @click="showAdd = true">Add task</button>
+        <div v-if="tasksLanguages" class="tasks-head">
+            <h1>{{ tasksLanguages?.title?.[lang] }}</h1>
+            <button @click="showAddMenu()">{{ tasksLanguages?.add?.[lang] }}</button>
         </div>
         
         <div class="tasks-body">
             
             <div v-if="taskList.length == 0" class="task">
                 <p>1.</p>
-                <p>Task example.</p>
+                <p>{{ tasksLanguages?.example?.[lang] }}</p>
             </div>
 
             <div v-for="(task, index) in taskList" :id="task.id" class="task">
@@ -86,7 +135,7 @@ function deleteTask(event) {
     position: absolute;
     display: flex;
     flex-direction: column;
-    background-color: rgb(223, 129, 129);
+    background-color: rgb(255, 153, 153);
     border-radius: 5px;
     height: 50%;
     min-height: 20rem;
@@ -104,10 +153,25 @@ function deleteTask(event) {
     z-index: 99;
 }
 
+.tasks-add-blur::before {
+    content: '';
+    inset: 0;
+    background-color: rgba(206, 206, 206, 0.295);
+    position: absolute;
+    filter: blur(5px);
+    z-index: 55;
+}
+
 .tasks-add-info {
     gap: .5rem;
     display: flex;
     flex-direction: column;
+}
+
+.task-add-info-error {
+    background-color: var(--darkBlue);
+    border-radius: 5px;
+    color: var(--lightWhite);
 }
 
 .tasks-add-info textarea {
@@ -165,6 +229,11 @@ html[data-theme=dark] .tasks-add {
 html[data-theme=dark] .tasks-add-info textarea {
     box-shadow: 0px 0px 7px 4px rgba(147, 212, 197, 0.06);
 }
+
+html[data-theme=dark] .task-add-info-error {
+    background-color: var(--lightRed);
+}
+
 .tasks {
     width: 90%;
     margin: 0 auto;
@@ -185,7 +254,6 @@ html[data-theme=dark] .tasks-add-info textarea {
 
 .tasks-head button {
     height: 100%;
-    width: 7.5rem;
     background-color: var(--lightRed);
     border: none;
     border-radius: 5px;

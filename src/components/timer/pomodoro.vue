@@ -1,7 +1,7 @@
 <script setup>
 
 import Timer from 'easytimer.js';
-import { ref, onBeforeMount, onMounted, toRefs, onBeforeUpdate } from 'vue';
+import { ref, onMounted, toRefs, onUpdated } from 'vue';
 import anime from 'animejs';
 import axios from 'axios';
 import { onBeforeRouteLeave } from 'vue-router';
@@ -18,6 +18,26 @@ let configMins = {
 }
 let settingsState = ref(false);
 let timer;
+
+function closeOnClickOut(event) {
+    if(event.target.id === "app") {
+        changeSettings();
+        document.removeEventListener("click", closeOnClickOut);
+        document.body.classList.remove('tasks-add-blur');
+    }
+}
+
+function showSettings() {
+    settingsState.value = true;
+    document.body.classList.add('tasks-add-blur');
+    document.addEventListener("click", closeOnClickOut)
+}
+
+function closeSettings() {
+    settingsState.value = false;
+    document.body.classList.remove('tasks-add-blur');
+    changeSettings();
+}
 
 const props = defineProps({
     lang: String
@@ -79,8 +99,8 @@ function changeMode(n, event) {
         default:
             break;
         }
-                modeAnim();
-            }
+            modeAnim();
+        }
             
 // Apply changge settings.
 function changeSettings() {
@@ -133,10 +153,9 @@ function modeAnim(instant) {
     }, 1);
 }
 
-onBeforeMount(async () => {
+onMounted(async () => {
     await getTranslates();
     generateNewChron();
-    modeAnim();
     window.addEventListener("resize", modeAnim);
 })
 
@@ -151,55 +170,18 @@ function sound() {
 }
 
 
-let timerLanguages = ref({ 
-    "field_timer_state_start": { 
-        "en": "Start", 
-        "es": "Iniciar" 
-    }, 
-    "field_timer_state_stop": { 
-        "en": "Pause", 
-        "es": "Pausar" 
-    }, 
-    "field_pomodoro": { 
-        "en": "Pomodoro", 
-        "es": "Pomodoro" 
-    }, 
-    "field_long_break": { 
-        "en": "Long break", 
-        "es": "Descanso largo" 
-    }, 
-    "field_short_break": { 
-        "en": "Short break", 
-        "es": "Descanso corto" 
-    }, 
-    "field_settings_pomodoro": { 
-        "en": "Pomodoro minutes", 
-        "es": "Minutos de pomodoro" 
-    }, 
-    "field_settings_long": { 
-        "en": "Long break minutes", 
-        "es": "Minutos de descanso largo" 
-    },
-    "field_settings": {
-        "en": "Settings",
-        "es": "Ajustes"
-    },
-    "field_settings_short": { 
-        "en": "Short break minutes", 
-        "es": "Minutos de descanso corto" 
-    }, "field_settings_max": {
-         "en": "Maximum amount", 
-         "es": "Cantidad máxima" }
-    });
+let timerLanguages = ref();
 async function getTranslates() {
     await axios({
         method: "GET",
         url: "/services/Timer.json"
     })
     .then(response => timerLanguages.value = response.data);
+
+    modeAnim();
 }
 
-onBeforeUpdate(() => {
+onUpdated(() => {
     modeAnim();
 })
 
@@ -227,10 +209,10 @@ onBeforeUpdate(() => {
         </div>
 
         <div class="pomodoro-timer-settings-footer">
-            <img @click="changeSettings()" src="/icons/tick.svg" alt="Tick Icon">
+            <img @click="closeSettings()" src="/icons/tick.svg" alt="Tick Icon">
         </div>
     </div>
-    <div class="pomodoro-timer">
+    <div v-if="timerLanguages" class="pomodoro-timer">
         <div class="pomodoro-timer-head">
             <button data-type="1" aria-label="Pomodoro Timer Mode" @click="changeMode(1, $event)" :class="selectedMode == 1 ? 'selected' : ''">{{ timerLanguages.field_pomodoro[lang] }}</button>
             <button data-type="2" aria-label="Short Break Mode" @click="changeMode(2, $event)" :class="selectedMode == 2 ? 'selected' : ''">{{ timerLanguages.field_short_break[lang] }}</button>
@@ -243,7 +225,7 @@ onBeforeUpdate(() => {
 
         <div class="pomodoro-timer-footer">
 
-            <button aria-label="Config Timer" @click="settingsState = true;">
+            <button aria-label="Config Timer" @click="showSettings()">
                 <img src="@/assets/icons/settings.svg" alt="Config timer Icon">
             </button>
             <button aria-label="Start or Pause Timer" @click="changeChronState(); sound()">{{ isActive ? timerLanguages.field_timer_state_stop[lang] : timerLanguages.field_timer_state_start[lang] }}</button>
@@ -252,9 +234,27 @@ onBeforeUpdate(() => {
             </button>
         </div>
     </div>
+
+    <div v-else class="placeholder-timer"></div>
+
 </template>
 
 <style>
+
+.placeholder-timer {
+    background-color: var(--lightRed);
+    max-width: 50rem;
+    width: 95%;
+    margin: 2rem auto;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0px 0px 7px 4px rgba(169, 67, 56, 0.24);
+    height: 14rem;
+}
+
+html[data-theme=dark] .placeholder-timer {
+    background-color: var(--darkBlue);
+}
 
 .pomodoro-timer-settings {
     position: absolute;

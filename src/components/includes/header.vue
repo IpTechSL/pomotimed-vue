@@ -5,8 +5,7 @@ import { onMounted, ref, watch } from 'vue';
 import anime from 'animejs';
 import router from '../../router';
 
-let icon = ref("moon");
-let dark = true;
+let dark = ref(false);
 
 const route = useRoute();
 let user = ref(route.params.user);
@@ -15,20 +14,16 @@ watch(route, async () => {
     user.value = route.params.user;
 })
 
-function setDark() {
-    if(!dark) {
-        icon.value = 'moon';
-        document.documentElement.dataset.theme = 'light';
-    } else {
-        icon.value = 'sun';
-        document.documentElement.dataset.theme = 'dark';
-    }
+// Toggle theme function.
+function toggleTheme() {
 
-    dark = !dark;
+    document.documentElement.dataset.theme = dark.value ? 'light' : 'dark';
+    dark.value = !dark.value;
+    localStorage.setItem('darkMode', dark.value);
 }
 
 
-
+// Get navar links
 let links = ref([]);
 axios({
     method: "GET",
@@ -36,13 +31,13 @@ axios({
 })
 .then(response => links.value = response.data)
 
+// Get language from navigator and apply to the document
 const navLang = navigator.language.split("-");
-document.documentElement.lang = navLang[0]
-const lang = ref(document.documentElement.lang);
-const showLangSelector = ref(false);
+document.documentElement.lang = navLang[0];
 
-const emit = defineEmits(["lang"]);
-
+// Get all avalaible  languages, check if navigator language it's in the avalaible languages.
+// If avalaible, keep it, if not swap to English.
+let lang = ref('en');
 let languages = ref();
 axios({
     method: "GET",
@@ -52,19 +47,41 @@ axios({
         password: "admin"
     }
 })
-.then(response => languages.value = response.data)
+.then(response => {
+    languages.value = response.data;
+    lang.value = languages.value[navLang[0]] ? navLang[0] : 'en';
+    document.documentElement.lang = lang.value;
+})
 
+// Show language selector.
+const showLangSelector = ref(false);
+
+const emit = defineEmits(["lang"]);
+
+// Change Language function.
 function changeLang(event) {
     lang.value = event.target.dataset.value;
     document.documentElement.lang = lang.value;
     emit("lang", lang)
 }
 
+// On mounted emit the language.
 onMounted(() => {
     emit('lang', lang);
+    
+    try {
+        dark.value = JSON.parse(localStorage.getItem("darkMode"));
+        document.documentElement.dataset.theme = dark.value ? 'dark' : 'light';
+    } catch (error) {
+        
+    }
 })
 
+watch(lang, async () => {
+    emit('lang', lang)
+})
 
+// Check if menu mobile it's active and animation declaration.
 let menuMobile = ref(false);
 function animMobile() {
     
@@ -196,6 +213,8 @@ function animMobile() {
     menuMobile.value = !menuMobile.value;
 }
 
+
+// Temporary Log out function.
 function logOut() {
     localStorage.removeItem('jwt');
     router.push('/');
@@ -203,7 +222,7 @@ function logOut() {
 </script>
 
 <template>
-    <button style="position: absolute; top: 7rem; left: 3rem;" @click="logOut()">Cerrar sesión</button>
+    <button style="position: absolute; top: 7rem; left: 3rem; opacity: .25;" @click="logOut()">Cerrar sesión</button>
     <header class="header">
     
         
@@ -226,8 +245,9 @@ function logOut() {
                 </button>
             
             
-                <button aria-label="Change Theme" class="change-theme-button" @click="setDark()">
-                    <img :src="`/icons/${icon}.svg`" :alt="`${icon} Icon`">
+                <button aria-label="Change Theme" class="change-theme-button" @click="toggleTheme()">
+                    <img v-if="dark" :src="`/icons/sun.svg`" :alt="`Sun Icon`">
+                    <img v-else-if="!dark" :src="`/icons/moon.svg`" :alt="`Moon Icon`">
                 </button>
             </div>
 
