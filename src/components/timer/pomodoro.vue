@@ -252,6 +252,10 @@ onUpdated(() => {
     height: 14rem;
 }
 
+html[data-theme=dark] .placeholder-timer {
+    background-color: var(--darkBlue);
+}
+
 .pomodoro-timer-settings {
     position: absolute;
     width: 95%;

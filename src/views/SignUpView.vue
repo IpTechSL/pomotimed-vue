@@ -46,10 +46,6 @@ async function signUser() {
             username: username.value,
             email: email.value,
             pass: password.value
-        },
-        auth: {
-            username: "admin",
-            password: "admin"
         }
     })
     .then(response => {
@@ -98,7 +94,7 @@ async function getTranslates() {
 <template>
     <main>
         <div v-if="showStatus" class="status" :class="errorOnSign ? 'error' : 'success'">
-            <p>User created successfully. Redirecting to log in...</p>
+            <p>{{ errorOnSign ? translations?.signerror?.[lang] : translations?.signsuccess?.[lang] }}</p>
         </div>
         <form v-if="translations" @submit.prevent="signUser()">
             <fieldset>

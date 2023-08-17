@@ -37,10 +37,6 @@ async function login() {
         data: {
             username: userData.value.username,
             password: userData.value.password
-        },
-        auth: {
-            username: "admin",
-            password: "admin"
         }
     })
     .then(response => {
@@ -81,7 +77,7 @@ async function getTranslates() {
 <template>
     <main>
         <div class="error" v-if="showError">
-            <p>Couldn't login. Check username or password.</p>
+            <p>{{ translations?.loginerror?.[lang] }}</p>
         </div>
         <form v-if="translations" @submit.prevent="login()">
             <fieldset>

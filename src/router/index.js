@@ -46,14 +46,11 @@ async function getUser() {
       url: "https://drupal.pomotimed.com/pomotimed/token-validation",
       headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': token
+          'X-CSRF-Token': token,
+          'Authorization': `Bearer ${jwt}`
       },
       data: {
-          token: jwt,
-      },
-      auth: {
-          username: "admin",
-          password: "admin"
+        
       }
     })
     .then(response => {

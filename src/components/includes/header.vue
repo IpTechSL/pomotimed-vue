@@ -68,13 +68,17 @@ function changeLang(event) {
 // On mounted emit the language.
 onMounted(() => {
     emit('lang', lang);
-
+    
     try {
         dark.value = JSON.parse(localStorage.getItem("darkMode"));
         document.documentElement.dataset.theme = dark.value ? 'dark' : 'light';
     } catch (error) {
         
     }
+})
+
+watch(lang, async () => {
+    emit('lang', lang)
 })
 
 // Check if menu mobile it's active and animation declaration.
