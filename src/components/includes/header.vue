@@ -222,7 +222,6 @@ function logOut() {
 </script>
 
 <template>
-    <p>{{ user }}</p>
     <button style="position: absolute; top: 7rem; left: 3rem; opacity: .25;" @click="logOut()">Cerrar sesión</button>
     <header class="header">
     
