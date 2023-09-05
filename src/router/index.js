@@ -31,6 +31,11 @@ const router = createRouter({
           router.push('/');
         } else true
       }
+    },
+    {
+      path: '/faq',
+      name: 'faq',
+      component: () => import('../views/FaqView.vue'),
     }
   ]
 
@@ -65,7 +70,7 @@ async function getUser() {
   return user;
 }
 
-router.currentRoute.value.params.user = await getUser();
+router.currentRoute.value.params.user = getUser();
 
 router.beforeEach(async (to, from) => {
   const user = await getUser();
