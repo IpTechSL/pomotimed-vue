@@ -9,13 +9,11 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: () => import('../views/HomeView.vue'),
-      props: true,
     },
     {
       path: '/login',
       name: 'login',
       component: () => import('../views/LoginView.vue'),
-      props: true,
       beforeEnter: (to, from) => {
         if(to.params.user) {
           router.push('/');
@@ -36,6 +34,26 @@ const router = createRouter({
       path: '/faq',
       name: 'faq',
       component: () => import('../views/FaqView.vue'),
+    },
+    {
+      path: '/projects',
+      name: 'projects',
+      component: () => import('../views/ProjectsView.vue'),
+      beforeEnter: (to, from) => {
+        if(!to.params.user) {
+          router.push('/');
+        } else true
+      }
+    },
+    {
+      path: '/projects/add',
+      name: 'projects add',
+      component: () => import('../views/NewProjectView.vue'),
+      beforeEnter: (to, from) => {
+        if(!to.params.user) {
+          router.push('/');
+        } else true
+      }
     }
   ]
 

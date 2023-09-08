@@ -1,0 +1,42 @@
+{
+    "title": {
+        "en": "New project",
+        "es": "Proyecto nuevo"
+    },
+    "name": {
+        "en": "Name",
+        "es": "Nombre"
+    },
+    "time_limit": {
+        "en": "Time limit",
+        "es": "Fecha límite"
+    },
+    "desc": {
+        "en": "Description",
+        "es": "Descripción"
+    },
+    "optional": {
+        "en": "Fields required.",
+        "es": "Campos obligatorios."
+    },
+    "create": {
+        "en": "Create",
+        "es": "Crear"
+    },
+    "creating": {
+        "en": "Creating",
+        "es": "Creando"
+    },
+    "error": {
+        "en": "There was an error creating the project, try later or contact us on support@pomotimed.com",
+        "es": "Ha habido un problema creando el proyecto, intenta más tarde o contáctanos en support@pomotimed.com"
+    },
+    "success": {
+        "en": "Project created successfully.",
+        "es": "Proyecto creado correctamente."
+    },
+    "redirect": {
+        "en": "Redirecting in...",
+        "es": "Redirigiendo en..."
+    }
+}

@@ -1,0 +1,30 @@
+{
+    "title": {
+        "en": "Projects",
+        "es": "Proyectos"
+    },
+    "add_project": {
+        "en": "New project",
+        "es": "Proyecto nuevo"
+    },
+    "state": {
+        "en": "State",
+        "es": "Estado"
+    },
+    "members": {
+        "en": "Members",
+        "es": "Miembros"
+    },
+    "edit": {
+        "en": "Edit",
+        "es": "Editar"
+    },
+    "leave": {
+        "en": "Leave",
+        "es": "Salir"
+    },
+    "remove": {
+        "en": "Remove",
+        "es": "Eliminar"
+    }
+}
