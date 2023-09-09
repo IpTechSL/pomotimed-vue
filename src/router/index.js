@@ -38,6 +38,10 @@ const router = createRouter({
     {
       path: '/projects',
       name: 'projects',
+      params: {
+        msg: '',
+        error: false
+      },
       component: () => import('../views/ProjectsView.vue'),
       beforeEnter: (to, from) => {
         if(!to.params.user) {
@@ -46,8 +50,8 @@ const router = createRouter({
       }
     },
     {
-      path: '/projects/add',
-      name: 'projects add',
+      path: '/projects/new',
+      name: 'projects new',
       component: () => import('../views/NewProjectView.vue'),
       beforeEnter: (to, from) => {
         if(!to.params.user) {

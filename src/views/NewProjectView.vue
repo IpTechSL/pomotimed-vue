@@ -38,11 +38,6 @@ let dateLimit = ref(null);
 let desc = ref(null);
 
 // Create project request status 
-let status = ref({
-    show: false,
-    error: false,
-    message: ""
-});
 let requested = ref(false);
 
 // Create Project
@@ -77,45 +72,40 @@ function createProject(dateLimit) {
     })
 }
 
+const router = useRouter();
+
 function showStatus(requestStatus) {
 
     switch (requestStatus) {
         case 200:
-            status.value.message = translations.value.success[lang.value];
-            status.value.show = true;
-            setTimeout(() => {
-                redirecting();
-            }, 500);
+            router.push(
+                {
+                    path: '/projects', 
+                    state: {
+                        msg: translations.value.success[lang.value],
+                        error: false
+                    }
+                }
+            )
             break;
         default:
-            status.value.message = translations.value.error[lang.value];
-            status.value.error = true;
-            status.value.show = true;
-            setTimeout(() => {
-                redirecting();
-            }, 500);
+            router.push(
+                {
+                    name: 'projects', 
+                    state: {
+                        msg: translations.value.error[lang.value],
+                        error: true
+                    }
+                }
+            )
             break;
     }
-}
-
-let timeLeft = ref(5);
-const router = useRouter();
-
-function redirecting() {
-    
-    const interval = setInterval(() => {
-        timeLeft.value == 1 ? clearInterval(interval) : null;
-        timeLeft.value == 1 ? router.push('/projects') : null; 
-        timeLeft.value-=1;
-    }, 1000);
 }
 
 </script>
 <template>
     <main>
         <h1>{{ titleInput ? titleInput : translations?.title?.[lang] }}</h1>
-        <p class="status" v-if="status.show" :class="status.error ? 'error' : 'success'">{{ status.message }}</p>
-        <p class="status" v-if="status.show" :class="status.error ? 'error' : 'success'">{{ translations?.redirect?.[lang] }} {{ timeLeft }}</p>
         <form @submit.prevent="createProject(dateLimit)">
             <fieldset>
                 <input type="text" name="name" id="name" v-model="titleInput" required autocomplete="off">
@@ -141,6 +131,9 @@ function redirecting() {
 main {
     width: 90%;
     margin: 2rem auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 h1 {
@@ -155,6 +148,31 @@ form {
     flex-direction: column;
     gap: 1.2rem;
     position: relative;
+    width: 100%;
+}
+
+@media screen and (min-width: 550px) {
+    form {
+        width: 80%;
+    }
+}
+
+@media screen and (min-width: 850px) {
+    form {
+        width: 70%;
+    }
+}
+
+@media screen and (min-width: 1100px) {
+    form {
+        width: 60%;
+    }
+}
+
+@media screen and (min-width: 1400px) {
+    form {
+        width: 50%;
+    }
 }
 
 form fieldset label {
