@@ -64,7 +64,6 @@ function changeLang(event) {
     document.documentElement.lang = lang.value;
     emit("lang", lang)
 }
-
 // On mounted emit the language.
 onMounted(() => {
     emit('lang', lang);

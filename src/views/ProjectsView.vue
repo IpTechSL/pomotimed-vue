@@ -1,7 +1,6 @@
 <script setup>
-import { onBeforeMount, toRefs, ref } from 'vue';
+import { onBeforeMount, toRefs, ref, inject } from 'vue';
 import axios from 'axios';
-import anime from 'animejs';
 
 onBeforeMount(async () => {
     await getTranslates();
@@ -23,40 +22,15 @@ async function getTranslates() {
     .then(response => translations.value = response.data);
 }
 
-// On submit warnings.
-let showWarning = ref(false);
-const errorOnSubmit = history.state.error;
-const msgOnSubmit = history.state.msg;
-let hideRow = ref(false);
-console.log(history.state)
 
-function WarningShow() {
-    showWarning.value = true;
-    setTimeout(() => {
-        const warningHolder = document.querySelector("#warning-holder");
-        warningHolder.classList.add("activeWarning");
-        hideRow.value = true;
 
-        setTimeout(() => {
-            warningHolder.classList.remove("activeWarning");
-
-            setTimeout(() => {
-                showWarning.value = false;
-            }, 1000);
-        }, 6000);
-    }, 300);
-}
-
-msgOnSubmit ? WarningShow() : null;
+const { showGlobalWarning } = inject('warning')
 
 </script>
 <template>
-    <div class="warning-holder" :class="errorOnSubmit ? 'error' : 'success'" id="warning-holder">
-        <div v-if="showWarning" class="warning" id="warning">
-            <p v-if="msgOnSubmit">{{ msgOnSubmit }}</p>
-        </div>
-        <span :class="hideRow ? 'hideRow' : ''"></span>
-    </div>
+    <button style="margin: .4rem 0; width: 10rem; align-self: center;" @click="showGlobalWarning('success', 'Invitación enviada correctamente.')">Enviado correctamente</button>
+    <button style="margin: .4rem 0; width: 10rem; align-self: center;" @click="showGlobalWarning('warn', 'El usuario ya pertenece a tu proyecto.')">Aviso</button>
+    <button style="margin: .4rem 0; width: 10rem; align-self: center;" @click="showGlobalWarning('error', 'Ha ocurrido un error y no se ha podido enviar la invitación.')">Error al enviar</button>
     <main>
         <div class="head">
             <h1>{{ translations?.title?.[lang] }}</h1>
@@ -101,54 +75,4 @@ h1 {
     cursor: pointer;
 }
 
-.warning-holder {
-    position: fixed;
-    width: 100%;
-    z-index: 99;
-    font-weight: bold;
-    top: -100%;
-    border-bottom: 1px solid rgb(39, 39, 39);
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    transition: top 1s;
-}
-
-.warning-holder p {
-    padding: 1rem;
-}
-
-.warning-holder span {
-    width: 100%;
-    height: 5px;
-    display: block;
-    align-self: flex-end;
-    transition: width 6s linear;
-}
-
-
-.error {
-    background-color: rgb(187, 61, 61);
-}
-
-.success {
-    background-color: rgb(72, 209, 104);
-}
-
-.error span {
-    background-color: rgb(255, 86, 86);
-}
-
-.success span {
-    background-color: rgb(53, 150, 75);
-
-}
-
-.activeWarning {
-    top: 0%;
-}
-
-.hideRow {
-    width: 0% !important;
-}
 </style>
