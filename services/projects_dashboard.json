@@ -26,5 +26,13 @@
     "remove": {
         "en": "Remove",
         "es": "Eliminar"
+    },
+    "archive": {
+        "en": "Archive",
+        "es": "Archivar"
+    },
+    "invite": {
+        "en": "Invite",
+        "es": "Invitar"
     }
 }

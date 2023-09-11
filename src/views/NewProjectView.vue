@@ -1,7 +1,7 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
-import { ref, watch, toRefs, onBeforeMount } from 'vue';
+import { ref, watch, toRefs, onBeforeMount, inject } from 'vue';
 
 // User changes
 const route = useRoute();
@@ -73,29 +73,24 @@ function createProject(dateLimit) {
 }
 
 const router = useRouter();
+const { showGlobalWarning } = inject('warning');
 
 function showStatus(requestStatus) {
 
     switch (requestStatus) {
         case 200:
+            showGlobalWarning('success', translations.value.success[lang.value])
             router.push(
                 {
                     path: '/projects', 
-                    state: {
-                        msg: translations.value.success[lang.value],
-                        error: false
-                    }
                 }
-            )
-            break;
+                )
+                break;
         default:
+            showGlobalWarning('error', translations.value.error[lang.value])
             router.push(
                 {
                     name: 'projects', 
-                    state: {
-                        msg: translations.value.error[lang.value],
-                        error: true
-                    }
                 }
             )
             break;
