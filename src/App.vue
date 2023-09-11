@@ -76,12 +76,12 @@ provide('warning', {
     width: 100%;
     z-index: 99;
     font-weight: bold;
-    top: -100%;
+    bottom: -100%;
     border-bottom: 1px solid rgb(39, 39, 39);
     display: flex;
     flex-direction: column;
     text-align: center;
-    transition: top 1s;
+    transition: bottom 1s;
 }
 
 @media screen and (min-width: 900px) {
@@ -140,12 +140,12 @@ provide('warning', {
 }
 
 .activeWarning {
-    top: 0%;
+    bottom: 0%;
 }
 
 @media screen and (min-width: 900px) {
     .activeWarning {
-        top: 4rem;
+        bottom: 4rem;
     }
 }
 
