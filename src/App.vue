@@ -51,6 +51,8 @@ provide('warning', {
     showGlobalWarning
 })
 
+provide('lang', globalLang);
+
 </script>
 
 <template>

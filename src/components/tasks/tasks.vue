@@ -1,5 +1,5 @@
 <script setup>
-import { isMemoSame, onBeforeMount, ref, toRefs } from 'vue';
+import { inject, onBeforeMount, ref } from 'vue';
 import axios from 'axios';
 
 // Tasks. 
@@ -68,12 +68,7 @@ onBeforeMount(() => {
     getTranslates();
 })
 
-
-const props = defineProps({
-    lang: String
-});
-const { lang } = toRefs(props);
-
+const lang = inject("lang");
 let tasksLanguages = ref();
 async function getTranslates() {
     await axios({

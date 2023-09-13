@@ -1,0 +1,22 @@
+{
+    "title": {
+        "en": "Invite an user",
+        "es": "Invitar a un usuario"
+    },
+    "submit": {
+        "en": "Send invitation",
+        "es": "Enviar invitación"
+    },
+    "success": {
+        "en": "Invitation sended",
+        "es": "Invitación enviada"
+    },
+    "warn": {
+        "en": "The user it's already in your project",
+        "es": "El usuario ya pertenece a tu proyecto"
+    },
+    "error": {
+        "en": "There was an error sending the invitation",
+        "es": "Ha ocurrido un problema al enviar la invitación"
+    }
+}

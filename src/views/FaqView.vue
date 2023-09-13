@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeMount, toRefs, ref } from 'vue';
+import { onBeforeMount, ref, inject } from 'vue';
 import axios from 'axios';
 
 onBeforeMount(async () => {
@@ -7,10 +7,9 @@ onBeforeMount(async () => {
 })
 
 // Get Translations.
-const props = defineProps({
-  lang: String
-})
-const { lang } = toRefs(props);
+
+const lang = inject("lang");
+
 
 let translations = ref();
 

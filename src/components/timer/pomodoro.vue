@@ -1,7 +1,7 @@
 <script setup>
 
 import Timer from 'easytimer.js';
-import { ref, onMounted, toRefs, onUpdated } from 'vue';
+import { ref, onMounted, inject, onUpdated } from 'vue';
 import anime from 'animejs';
 import axios from 'axios';
 import { onBeforeRouteLeave } from 'vue-router';
@@ -39,10 +39,7 @@ function closeSettings() {
     changeSettings();
 }
 
-const props = defineProps({
-    lang: String
-});
-const { lang } = toRefs(props);
+const lang = inject("lang");
 // Chron state / generation.
 function changeChronState() {
     if(isActive.value) {

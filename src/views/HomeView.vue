@@ -2,17 +2,14 @@
 
 import PomodoroTimer from '@/components/timer/pomodoro.vue';
 import Tasks from '@/components/tasks/tasks.vue';
-import { toRefs } from 'vue';
+import { inject } from 'vue';
 
-const props = defineProps({
-  lang: String
-})
-const { lang } = toRefs(props);
+const lang = inject("lang");
 </script>
 
 <template>
   <main>
-    <PomodoroTimer :lang="lang" />
-    <Tasks :lang="lang" />
+    <PomodoroTimer />
+    <Tasks />
   </main>
 </template>

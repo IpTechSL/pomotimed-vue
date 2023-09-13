@@ -1,7 +1,7 @@
 <script setup>
 import { RouterLink, useRoute } from 'vue-router';
 import axios from 'axios';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, provide } from 'vue';
 import anime from 'animejs';
 import router from '../../router';
 
@@ -62,7 +62,7 @@ const emit = defineEmits(["lang"]);
 function changeLang(event) {
     lang.value = event.target.dataset.value;
     document.documentElement.lang = lang.value;
-    emit("lang", lang)
+    emit("lang", lang);
 }
 // On mounted emit the language.
 onMounted(() => {

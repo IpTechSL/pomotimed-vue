@@ -1,7 +1,7 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
-import { ref, watch, toRefs, onBeforeMount, inject } from 'vue';
+import { ref, watch, inject, onBeforeMount, inject } from 'vue';
 
 // User changes
 const route = useRoute();
@@ -17,11 +17,7 @@ onBeforeMount(async () => {
 })
 
 // Get Translations.
-const props = defineProps({
-  lang: String
-})
-const { lang } = toRefs(props);
-
+const lang = inject("lang");
 let translations = ref();
 
 async function getTranslates() {

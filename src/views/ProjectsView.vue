@@ -1,7 +1,8 @@
 <script setup>
-import { onBeforeMount, toRefs, ref, inject, watch } from 'vue';
+import { onBeforeMount, toRefs, ref, inject, watch, provide } from 'vue';
 import axios from 'axios';
 import { useRoute } from 'vue-router';
+import Modals from '../components/modals/modals.vue'
 
 onBeforeMount(async () => {
     await getTranslates();
@@ -68,12 +69,28 @@ function activeOptions(event) {
     targeted.classList.toggle("project-body-options-menu-active");
 }
 
+// Modals options
+const showModals = ref(false);
+const projectId = ref();
+const typeOfModal = ref();
+
+provide("showModal", {
+    setShowModal
+})
+
+function setShowModal(value) {
+    console.log("Desde invite");
+    showModals.value = value;
+}
+
+function showModal(type, event) {
+    typeOfModal.value = type;
+    projectId.value = event.target.dataset.id;
+    showModals.value = true;
+}
 </script>
 <template>
-    <!-- <p>{{user}}</p> -->
-    <!-- <button style="margin: .4rem 0; width: 10rem; align-self: center;" @click="showGlobalWarning('success', 'Invitación enviada correctamente.')">Enviado correctamente</button>
-    <button style="margin: .4rem 0; width: 10rem; align-self: center;" @click="showGlobalWarning('warn', 'El usuario ya pertenece a tu proyecto.')">Aviso</button>
-    <button style="margin: .4rem 0; width: 10rem; align-self: center;" @click="showGlobalWarning('error', 'Ha ocurrido un error y no se ha podido enviar la invitación.')">Error al enviar</button> -->
+    <Modals v-if="showModals" :type="typeOfModal" :projectId="projectId" />
     <main>
         <div class="head">
             <h1>{{ translations?.title?.[lang] }}</h1>
@@ -153,7 +170,7 @@ function activeOptions(event) {
                                     </li>
                                     <template v-if="project.ownerId == user.uid">
                                         <li class="project-body-options-menu-general">
-                                            <button>{{ translations?.invite?.[lang] }}</button>
+                                            <button :data-id="project.nid" @click="showModal('invite', $event)">{{ translations?.invite?.[lang] }}</button>
                                         </li>
                                         <li class="project-body-options-menu-general">
                                             <button>{{ translations?.archive?.[lang] }}</button>
