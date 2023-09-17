@@ -31,7 +31,7 @@ function shouldClose(event) {
 .modal-holder {
     width: 100%;
     height: 100%;
-    position: absolute;
+    position: fixed;
     background-color: rgba(199, 199, 199, 0.445);
     display: flex;
     align-items: center;

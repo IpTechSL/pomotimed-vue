@@ -66,7 +66,7 @@ provide('lang', globalLang);
 
     <Header @lang="globalLang = $event.value" />
   
-    <RouterView :lang="globalLang"/>
+    <RouterView/>
   
     <Footer />
 

@@ -53,11 +53,10 @@ function showWarning(status) {
         case 200:
             showGlobalWarning("success", translations.value.success[lang.value]);
             break;
-        case 405:
+        case 400:
             showGlobalWarning("warn", translations.value.warn[lang.value]);
             break;
         default:
-            console.log(translations.value);
             showGlobalWarning("error", translations.value.error[lang.value]);
             break;
     }

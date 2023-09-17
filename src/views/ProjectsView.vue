@@ -10,10 +10,7 @@ onBeforeMount(async () => {
 })
 
 // Get props.
-const props = defineProps({
-  lang: String
-})
-const { lang } = toRefs(props);
+const lang = inject('lang');
 
 let translations = ref();
 

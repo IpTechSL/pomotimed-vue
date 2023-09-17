@@ -58,6 +58,11 @@ const router = createRouter({
           router.push('/');
         } else true
       }
+    },
+    {
+      path: '/validate',
+      name: 'accept invite',
+      component: () => import('../views/AcceptInviteView.vue'),
     }
   ]
 

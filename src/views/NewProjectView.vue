@@ -1,7 +1,7 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
-import { ref, watch, inject, onBeforeMount, inject } from 'vue';
+import { ref, watch, inject, onBeforeMount } from 'vue';
 
 // User changes
 const route = useRoute();
