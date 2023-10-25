@@ -1,6 +1,7 @@
 <script setup>
 import { provide, inject } from 'vue';
 import Invite from './invite.vue';
+import Leave from './leave.vue'
 
 
 // Get props.
@@ -20,8 +21,9 @@ function shouldClose(event) {
     <Teleport to="body">
         <div class="modal-holder" @click="shouldClose($event)">
             <div class="modal">
-                <img src="/icons/cross.svg" alt="Cross icon" @click="setShowModal(false)">
-                <Invite />
+                <img v-if="props.type != 'leave'" src="/icons/cross.svg" alt="Cross icon" @click="setShowModal(false)">
+                <Invite v-if="props.type === 'invite'" />
+                <Leave  v-if="props.type === 'leave'"/>
             </div>
         </div>
     </Teleport>
@@ -46,6 +48,11 @@ function shouldClose(event) {
     display: flex;
     flex-direction: column;
     gap: .5rem;
+}
+
+html[data-theme=dark] .modal {
+    background-color: var(--darkBlue);
+    color: var(--lightWhite);
 }
 
 .modal img {

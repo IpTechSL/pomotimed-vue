@@ -76,19 +76,26 @@ provide("showModal", {
 })
 
 function setShowModal(value) {
-    console.log("Desde invite");
     showModals.value = value;
 }
 
-function showModal(type, event) {
+function showModal(type, project_ID) {
     typeOfModal.value = type;
-    projectId.value = event.target.dataset.id;
+    projectId.value = project_ID;
     showModals.value = true;
+}
+
+provide("setKey", {setKeyToRefresh});
+
+let key = ref(0);
+function setKeyToRefresh() {
+    key.value = 1;
+    getProjects()
 }
 </script>
 <template>
     <Modals v-if="showModals" :type="typeOfModal" :projectId="projectId" />
-    <main>
+    <main :key="key">
         <div class="head">
             <h1>{{ translations?.title?.[lang] }}</h1>
         </div>
@@ -110,7 +117,6 @@ function showModal(type, event) {
                             <img :data-index="index" src="/icons/arrow.svg" alt="Arrow Icon">
                         </button>
                     </div>
-
                     <div class="project-body">
                         <div class="project-body-state">
                             <h3>{{ translations?.state?.[lang] }}</h3>
@@ -120,38 +126,20 @@ function showModal(type, event) {
                         </div>
                         <div class="project-body-members">
                             <h3>{{ translations?.members?.[lang] }}</h3>
-                            <div class="project-body-members-holder">
-                                <div class="project-body-members-member">
+                            <ul class="project-body-members-holder">
+                                <li class="project-body-members-member">
                                     <span>
-                                        <p>poladri11</p>
+                                        <p>{{ project.ownerdata.username }}</p>
                                     </span>
-                                    <img width="50" height="50" src="https://media.gettyimages.com/id/1602420601/es/foto/pink-and-bluish-glow-from-a-falcon-9-rocket-launch.jpg?s=2048x2048&w=gi&k=20&c=6Wr6AvS2Ael8sHI-nFhGWVYI9oQ-pVzugNiL48yK3g8=" alt="Image">
-                                </div>
-                                <div class="project-body-members-member">
+                                    <img width="64" height="64" :src="project.ownerdata.profile_picture ? project.ownerdata.profile_picture  : '/icons/placeholder-user.jpeg'" :alt="`Profile picture of ${project.ownerdata.username}`">
+                                </li>
+                                <li v-for="member in project.members" class="project-body-members-member">
                                     <span>
-                                        <p>Ismaelsv13</p>
+                                        <p>{{ member.username }}</p>
                                     </span>
-                                    <img width="50" height="50" src="https://media.gettyimages.com/id/1475391957/es/vector/gatos-grises-sobre-un-conjunto-de-fondo-beige.webp?s=612x612&w=gi&k=20&c=nMFI13jt3jPaUaG52GQIv1McW2BO0M-xPwito0ceLkA=" alt="Image">
-                                </div>
-                                <div class="project-body-members-member">
-                                    <span>
-                                        <p>Vultur</p>
-                                    </span>
-                                    <img width="50" height="50" src="https://media.gettyimages.com/id/1533790985/es/foto/cabello-moderno-foto-de-archivo.webp?s=612x612&w=gi&k=20&c=WW4Mx9Akj196Cmr4cfeKIBA-_JFtexOy_qmQOY8-kTA=" alt="Image">
-                                </div>
-                                <div class="project-body-members-member">
-                                    <span>
-                                        <p>Paco</p>
-                                    </span>
-                                    <img width="50" height="50" src="https://media.gettyimages.com/id/1409730005/es/foto/chef-cocinando-en-un-restaurante-y-quemando-la-comida.webp?s=612x612&w=gi&k=20&c=mpsnuTtP6I1XmxR9oV1a-eni9_5U-h2jeSPzspwfcHA=" alt="Image">
-                                </div>
-                                <div class="project-body-members-member">
-                                    <span>
-                                        <p>Vultur</p>
-                                    </span>
-                                    <img width="50" height="50" src="https://media.gettyimages.com/id/1533790985/es/foto/cabello-moderno-foto-de-archivo.webp?s=612x612&w=gi&k=20&c=WW4Mx9Akj196Cmr4cfeKIBA-_JFtexOy_qmQOY8-kTA=" alt="Image">
-                                </div>
-                            </div>
+                                    <img width="64" height="64" :src="member.profile_picture ? member.profile_picture  : '/icons/placeholder-user.jpeg'" :alt="`Profile picture of ${member.username}`">
+                                </li>
+                            </ul>
                         </div>
                         <div class="project-body-options">
                             <button :data-index="index" @click="activeOptions($event)">
@@ -167,7 +155,7 @@ function showModal(type, event) {
                                     </li>
                                     <template v-if="project.ownerId == user.uid">
                                         <li class="project-body-options-menu-general">
-                                            <button :data-id="project.nid" @click="showModal('invite', $event)">{{ translations?.invite?.[lang] }}</button>
+                                            <button @click="showModal('invite', project.nid)">{{ translations?.invite?.[lang] }}</button>
                                         </li>
                                         <li class="project-body-options-menu-general">
                                             <button>{{ translations?.archive?.[lang] }}</button>
@@ -178,7 +166,7 @@ function showModal(type, event) {
                                     </template>
                                     <template v-else>
                                         <li class="project-body-options-menu-leave">
-                                            <button>{{ translations?.leave?.[lang] }}</button>
+                                            <button @click="showModal('leave',  project.nid)">{{ translations?.leave?.[lang] }}</button>
                                         </li>
                                     </template>
                                 </ul>
@@ -203,6 +191,11 @@ h1 {
 
 html[data-theme=dark] h1 {
     color: var(--lightWhite);
+}
+
+ul {
+    list-style: none;
+    padding: 0;
 }
 
 .body {
@@ -411,8 +404,8 @@ html[data-theme=dark] .project-body-members-member span {
 
 .project-body-members-member img {
     border-radius: 100%;
-    width: 28px;
-    height: 28px;
+    width: 40px;
+    height: 40px;
     border: 1px solid var(--darkBlueText);
     object-fit: cover;
     transition: all .25s;
@@ -470,13 +463,13 @@ html[data-theme=dark] .project-body-members-member img {
     flex-direction: column;
     gap: .25rem;
     padding: 0rem;
-    height: 0px;
+    max-height: 0rem;
     overflow: hidden;
     transition: all .75s ease;
 }
 
 .project-body-options-menu-active ul {
-    height: 10rem;
+    max-height: 40rem;
 }
 
 .project-body-options-menu ul li {
@@ -529,11 +522,13 @@ html[data-theme=dark] .project-body-options-menu-general:hover {
 }
 
 
-.project-body-options-menu-remove  {
+.project-body-options-menu-remove,
+.project-body-options-menu-leave  {
     background-color: var(--darkBlueText);
     transition: all .25s;
 }
-.project-body-options-menu-remove button {
+.project-body-options-menu-remove button,
+.project-body-options-menu-leave button {
     color: red;
     font-weight: bold;
     transition: all .25s;
@@ -542,15 +537,18 @@ html[data-theme=dark] .project-body-options-menu-general:hover {
 .project-body-options-menu-remove:hover {
     background-color: rgb(44, 44, 57)}
 
-html[data-theme=dark] .project-body-options-menu-remove {
+html[data-theme=dark] .project-body-options-menu-remove,
+html[data-theme=dark] .project-body-options-menu-leave {
     background-color: var(--lightRed);
 }
 
-html[data-theme=dark] .project-body-options-menu-remove button {
-    color: var(--darkBlueHF);
+html[data-theme=dark] .project-body-options-menu-remove button,
+html[data-theme=dark] .project-body-options-menu-leave button {
+    color: var(--lightWhite);
 }
 
-html[data-theme=dark] .project-body-options-menu-remove:hover {
+html[data-theme=dark] .project-body-options-menu-remove:hover,
+html[data-theme=dark] .project-body-options-menu-leave:hover {
     background-color: #e7311c;
 }
 

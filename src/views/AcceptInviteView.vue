@@ -25,7 +25,6 @@ const route = useRoute();
 const token = route.query.t;
 
 // Accept invite
-const isLoading = ref(true);
 
 function acceptInvite() {
 
@@ -56,7 +55,6 @@ function showWarn(status) {
             showGlobalWarning('success', translations.value.success[lang.value])
             
             setTimeout(() => {
-                isLoading.value = false;
                 router.push(
                     {
                         name: 'home', 
@@ -69,7 +67,6 @@ function showWarn(status) {
             showGlobalWarning('error', translations.value.error[lang.value]);
             
             setTimeout(() => {
-                isLoading.value = false;
                 router.push(
                     {
                         name: 'home', 
@@ -88,7 +85,7 @@ onMounted(() => {
 <template>
     <main>
         <h1>{{ translations?.title?.[lang] }}</h1>
-        <div v-if="isLoading" class="loader"></div>
+        <div class="loader"></div>
     </main>
 </template>
 

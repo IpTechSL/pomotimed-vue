@@ -1,0 +1,14 @@
+{
+    "title": {
+        "en": "Leave the project",
+        "es": "Salir del proyecto"
+    },
+    "success": {
+        "en": "Project leaved successfully",
+        "es": "Proyecto abandonado correctamente"
+    },
+    "error": {
+        "en": "There was an error while trying to leave the project",
+        "es": "Ha ocurrido un problema al intentar salir del proyecto"
+    }
+}
