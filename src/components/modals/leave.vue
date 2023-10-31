@@ -1,7 +1,7 @@
 <script setup>
-import { onBeforeMount, ref, inject } from 'vue';
+import { onBeforeMount, ref, inject, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import axios from 'axios';
-import router from '../../router/index'
 
 
 // Translations
@@ -20,6 +20,15 @@ onBeforeMount(async () => {
     await getTranslates();
 })
 
+// User
+const route = useRoute();
+let user = ref(route.params.user);
+
+watch(route, async () => {
+    user.value = route.params.user;
+})
+
+
 const { showGlobalWarning } = inject('warning');
 const { setKeyToRefresh } = inject("setKey")
 
@@ -32,7 +41,7 @@ function leaveProject() {
     const jwt = localStorage.getItem('jwt');
     axios({
         method: "DELETE",
-        url: `https://drupal.pomotimed.com/pomotimed/project/user/39/project/${projectId}`,
+        url: `https://drupal.pomotimed.com/pomotimed/project/user/${user.value.uid}/project/${projectId}`,
         data: {
             
         },
@@ -70,7 +79,6 @@ function showWarning(status) {
 </script>
 
 <template>
-
     <h1>{{ translations?.title?.[lang] }}</h1>
 
     <div>

@@ -1,7 +1,7 @@
 <script setup>
 import { RouterLink, useRoute } from 'vue-router';
 import axios from 'axios';
-import { onMounted, ref, watch, provide } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import anime from 'animejs';
 import router from '../../router';
 
