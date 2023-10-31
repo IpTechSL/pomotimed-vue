@@ -95,7 +95,7 @@ function setKeyToRefresh() {
 </script>
 <template>
     <Modals v-if="showModals" :type="typeOfModal" :projectId="projectId" />
-    <main :key="key">
+    <main :key="key" v-if="translations?.title[lang]">
         <div class="head">
             <h1>{{ translations?.title?.[lang] }}</h1>
         </div>

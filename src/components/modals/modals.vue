@@ -61,6 +61,11 @@ html[data-theme=dark] .modal {
     width: 28px;
     filter: grayscale(1);
     place-self: flex-end;
+    cursor: pointer;
+}
+
+html[data-theme=dark] .modal img {
+    filter: invert(1);
 }
 
 </style>

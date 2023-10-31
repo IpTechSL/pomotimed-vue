@@ -209,7 +209,7 @@ onUpdated(() => {
             <img @click="closeSettings()" src="/icons/tick.svg" alt="Tick Icon">
         </div>
     </div>
-    <div v-if="timerLanguages" class="pomodoro-timer">
+    <div v-if="timerLanguages?.field_timer_state_start[lang]" class="pomodoro-timer">
         <div class="pomodoro-timer-head">
             <button data-type="1" aria-label="Pomodoro Timer Mode" @click="changeMode(1, $event)" :class="selectedMode == 1 ? 'selected' : ''">{{ timerLanguages.field_pomodoro[lang] }}</button>
             <button data-type="2" aria-label="Short Break Mode" @click="changeMode(2, $event)" :class="selectedMode == 2 ? 'selected' : ''">{{ timerLanguages.field_short_break[lang] }}</button>
@@ -232,7 +232,6 @@ onUpdated(() => {
         </div>
     </div>
 
-    <div v-else class="placeholder-timer"></div>
 
 </template>
 

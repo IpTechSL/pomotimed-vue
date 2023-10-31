@@ -20,12 +20,18 @@ onBeforeMount(async () => {
 const lang = inject("lang");
 let translations = ref();
 
+const finished = ref(false);
 async function getTranslates() {
     axios({
         method: "GET",
         url: "/services/new_project.json"
     })
-    .then(response => translations.value = response.data);
+    .then(response => {
+        translations.value = response.data
+        setTimeout(() => {
+            finished.value = true;
+        }, 300);
+    });
 }
 
 // Form fields
@@ -95,7 +101,7 @@ function showStatus(requestStatus) {
 
 </script>
 <template>
-    <main>
+    <main v-if="translations?.title[lang]">
         <h1>{{ titleInput ? titleInput : translations?.title?.[lang] }}</h1>
         <form @submit.prevent="createProject(dateLimit)">
             <fieldset>

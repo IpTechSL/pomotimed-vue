@@ -79,7 +79,7 @@ async function getTranslates() {
 }
 </script>
 <template>
-    <section class="tasks">
+    <section class="tasks" v-if="tasksLanguages?.title[lang]">
         <div v-if="showAdd" class="tasks-add">
             <h2>{{ tasksLanguages?.add?.[lang] }}</h2>
             <div class="tasks-add-info">

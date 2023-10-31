@@ -39,6 +39,7 @@ document.documentElement.lang = navLang[0];
 // If avalaible, keep it, if not swap to English.
 let lang = ref('en');
 let languages = ref();
+const hasLoaded = ref(false);
 axios({
     method: "GET",
     url: "https://drupal.pomotimed.com/pomotimed/languages",
@@ -51,6 +52,7 @@ axios({
     languages.value = response.data;
     lang.value = languages.value[navLang[0]] ? navLang[0] : 'en';
     document.documentElement.lang = lang.value;
+    hasLoaded.value = true;
 })
 
 // Show language selector.
@@ -227,7 +229,7 @@ function logOut() {
         
         <div class="header-cont">
 
-            <div class="header-buttons">
+            <div class="header-buttons" v-if="hasLoaded">
                 <button class="lang-selector" @click="showLangSelector = !showLangSelector">
                     <p class="lang-selector-selected"><img style="width: 32px;" :src="`/icons/lang/${lang}.png`" :alt="lang + 'language'"></p> 
                     <ul v-if="showLangSelector">

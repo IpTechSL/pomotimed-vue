@@ -105,7 +105,7 @@ fieldset input {
     border: none;
     border-bottom: 1px solid var(--darkBlue);
     color: var(--darkBlueText);
-    font-weight: bold;
+    font-weight: normal;
     letter-spacing: 1px;
 }
 
@@ -114,12 +114,33 @@ input[type=submit] {
     font-weight: bold;
     color: var(--darkBlueText);
     letter-spacing: 1px;
-    background-color: var(--lightRed);
+    background-color: rgb(255, 79, 79);
     padding: .5rem;
     border-radius: 2px;
     width: fit-content;
     align-self: center;
     border: 1px solid rgba(128, 128, 128, 0.455);
+}
+
+input[type=submit]:hover {
+    background-color: rgb(250, 61, 61);
+    cursor: pointer;
+}
+
+html[data-theme=dark] fieldset input {
+    border-bottom-color: var(--lightWhite);
+    color: var(--lightWhite);
+}
+
+html[data-theme=dark] input[type=submit] {
+    background-color: rgb(63, 63, 158);
+    color: var(--lightWhite);
+}
+
+
+html[data-theme=dark] input[type=submit]:hover {
+    background-color: rgb(46, 46, 124);
+    color: var(--lightWhite);
 }
 
 </style>
