@@ -151,17 +151,17 @@ function setKeyToRefresh() {
                             <div class="project-body-options-menu">
                                 <ul>
                                     <li class="project-body-options-menu-general">
-                                        <button>{{ translations?.edit?.[lang] }}</button>
+                                        <button>{{ translations?.open?.[lang] }}</button>
                                     </li>
                                     <template v-if="project.ownerId == user.uid">
                                         <li class="project-body-options-menu-general">
                                             <button @click="showModal('invite', project.nid)">{{ translations?.invite?.[lang] }}</button>
                                         </li>
                                         <li class="project-body-options-menu-general">
-                                            <button>{{ translations?.archive?.[lang] }}</button>
+                                            <button @click="showModal('archive',  project.nid)">{{ translations?.archive?.[lang] }}</button>
                                         </li>
                                         <li class="project-body-options-menu-remove">
-                                            <button>{{ translations?.remove?.[lang] }}</button>
+                                            <button @click="showModal('delete',  project.nid)">{{ translations?.remove?.[lang] }}</button>
                                         </li>
                                     </template>
                                     <template v-else>

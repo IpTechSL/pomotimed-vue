@@ -1,0 +1,14 @@
+{
+    "title": {
+        "en": "Delete the project",
+        "es": "Borrar el proyecto"
+    },
+    "success": {
+        "en": "Project deleted successfully",
+        "es": "Proyecto borrado correctamente"
+    },
+    "error": {
+        "en": "There was an error trying to delete the project",
+        "es": "Ha ocurrido un error al intentar borrar el proyecto"
+    }
+}

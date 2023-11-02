@@ -1,0 +1,14 @@
+{
+    "title": {
+        "en": "Archive the project",
+        "es": "Archivar el projecto"
+    },
+    "success": {
+        "en": "Project archived successfully",
+        "es": "Proyecto archivado correctamente"
+    },
+    "error": {
+        "en": "There was an error trying to archive the project",
+        "es": "Ha ocurrido un error al intentar archivar el proyecto"
+    }
+}
