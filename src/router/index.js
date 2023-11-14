@@ -37,10 +37,6 @@ const router = createRouter({
     {
       path: '/projects',
       name: 'projects',
-      params: {
-        msg: '',
-        error: false
-      },
       component: () => import('../views/ProjectsView.vue'),
       beforeEnter: (to, from) => {
         if(!to.params.user) {
@@ -62,6 +58,19 @@ const router = createRouter({
       path: '/validate',
       name: 'accept invite',
       component: () => import('../views/AcceptInviteView.vue'),
+    },
+    {
+      path: '/projects/:projectID',
+      name: 'project',
+      component: () => import('../views/ProjectView.vue'),
+      beforeEnter: (to, from) => {
+        console.log(to);
+        if(!to.params.user) {
+          router.push('/');
+        } else {
+          true
+        }
+      }
     }
   ]
 

@@ -146,7 +146,6 @@ function setKeyToRefresh() {
                                 <span></span>
                                 <span></span>
                                 <span></span>
-                                <!-- <img :data-index="index" width="24" height="24" src="/icons/dots.svg" alt="Dots Icon for options"> -->
                             </button>
                             <div class="project-body-options-menu">
                                 <ul>
