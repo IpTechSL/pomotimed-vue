@@ -109,9 +109,9 @@ function setKeyToRefresh() {
 
                 <div class="project" v-for="(project, index) in projects">
                     <div class="project-head">
-                        <a href="#">
+                        <RouterLink :to="`/projects/${project.nid}`">
                             <img src="/icons/external.svg" alt="External link Icon">
-                        </a>
+                        </RouterLink>
                         <h2 :data-index="index" @click="toggleProjectView($event)">{{ project.title }}</h2>
                         <button :data-index="index" @click="toggleProjectView($event)">
                             <img :data-index="index" src="/icons/arrow.svg" alt="Arrow Icon">
@@ -150,7 +150,9 @@ function setKeyToRefresh() {
                             <div class="project-body-options-menu">
                                 <ul>
                                     <li class="project-body-options-menu-general">
-                                        <button>{{ translations?.open?.[lang] }}</button>
+                                        <RouterLink :to="`/projects/${project.nid}`">
+                                            <button>{{ translations?.open?.[lang] }}</button>
+                                        </RouterLink>
                                     </li>
                                     <template v-if="project.ownerId == user.uid">
                                         <li class="project-body-options-menu-general">

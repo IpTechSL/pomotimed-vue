@@ -1,0 +1,22 @@
+{
+    "nodesc": {
+        "en": "This project doesn't has any description",
+        "es": "Este proyecto no tiene descripción"
+    },
+    "members": {
+        "en": "Members",
+        "es": "Miembros"
+    },
+    "tasks": {
+        "en": "Tasks",
+        "es": "Tareas"
+    },
+    "tasks_active": {
+        "en": "Active",
+        "es": "Activas"
+    },
+    "tasks_finished": {
+        "en": "Finised",
+        "es": "Terminadas"
+    }
+}
